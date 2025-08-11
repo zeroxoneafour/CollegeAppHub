@@ -5,6 +5,7 @@
 
 	let { children } = $props();
 
+	userData.loadUserData();
 	$effect(() => {
 		userData.saveUserData();
 	});

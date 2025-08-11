@@ -210,8 +210,9 @@ class CollegeInfoManager {
 
 	initialize(collegeList: object) {
 		for (const [collegeName, collegeId] of Object.entries(collegeList)) {
-			// only alphanumeric lowercase
-			let lowercase = collegeName.toLocaleLowerCase().replace(/[^a-z0-9 ]/gi, "");
+			// only alphanumeric lowercase, convert dashes to spaces
+			let lowercase = collegeName.split("-").join(" ");
+			lowercase = collegeName.toLocaleLowerCase().replace(/[^a-z0-9 ]/gi, "");
 			this.collegeSearchNames.push({ name: lowercase, id: collegeId });
 			let filterWords = ["of", "in", "the", "at"];
 			let abbreviation = lowercase

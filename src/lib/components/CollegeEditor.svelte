@@ -1,12 +1,13 @@
 <script lang="ts">
     import { College, Supplemental, type CollegeInfo, type Value, collegeInfoManager, SupplementalRequired, isSupplementalRequired, SupplementalType } from "$lib/colleges.svelte";
+	import userData from "$lib/userdata.svelte";
     let { college }: { college: College } = $props();
 
     let collegeInfo = $derived(college.collegeInfo);
 
     function getSupplementalsByRequirement(requirement: SupplementalRequired): () => string[] {
 		return () => {
-			if (collegeInfo === null) return [];
+			if (collegeInfo == null) return [];
 			let supplementalRequirements = collegeInfo.ApplicationDetails.SupplementalRequirements;
 
 			let ret = [];
@@ -44,6 +45,26 @@
 	function addSupplemental() {
 		college.supplementals.push(new Supplemental("", SupplementalType.Essay, ""));
 	}
+
+    let actColor = $derived.by(() => {
+        if (collegeInfo == null) return "";
+        if (collegeInfo.CalculatedFields.ACTMin > userData.actScore) return "error"; 
+        else if (collegeInfo.CalculatedFields.ACTMax < userData.actScore) return "success";
+        else return "warning";
+    });
+    let satColor = $derived.by(() => {
+        if (collegeInfo == null) return "";
+        if (collegeInfo.CalculatedFields.SATMin > userData.satScore) return "error"; 
+        else if (collegeInfo.CalculatedFields.SATMax < userData.satScore) return "success";
+        else return "warning";
+    });
+    let acceptanceRateColor = $derived.by(() => {
+        if (collegeInfo == null) return "";
+        if (collegeInfo.CalculatedFields.AcceptanceRate > 75) return "success"; 
+        else if (collegeInfo.CalculatedFields.AcceptanceRate < 25) return "error";
+        else return "warning";
+    });
+
 </script>
 
 <div class="flex flex-col items-center h-fill w-fill gap-10">
@@ -53,17 +74,18 @@
         collegeInfo.CalculatedFields.AcceptanceRate > 0
     )}
         <div class="flex flex-row gap-10">
+            <!-- TAILWIND GENERATE - progress-success progress-warning progress-error -->
             {#if collegeInfo.CalculatedFields.SATAvg !== 0}
                 <div>
                     <p class="w-full text-center">Average SAT - {collegeInfo.CalculatedFields.SATAvg}</p>
-                    <progress class="progress w-full" value={collegeInfo.CalculatedFields.SATAvg} max="1600"
+                    <progress class="progress progress-{satColor} w-full" value={collegeInfo.CalculatedFields.SATAvg} max="1600"
                     ></progress>
                 </div>
             {/if}
             {#if collegeInfo.CalculatedFields.ACTAvg !== 0}
                 <div>
                     <p class="w-full text-center">Average ACT - {collegeInfo.CalculatedFields.ACTAvg}</p>
-                    <progress class="progress w-full" value={collegeInfo.CalculatedFields.ACTAvg} max="36"
+                    <progress class="progress progress-{actColor} w-full" value={collegeInfo.CalculatedFields.ACTAvg} max="36"
                     ></progress>
                 </div>
             {/if}
@@ -73,7 +95,7 @@
                         Acceptance Rate - {collegeInfo.CalculatedFields.AcceptanceRate.toFixed(2)}%
                     </p>
                     <progress
-                        class="progress w-full"
+                        class="progress progress-{acceptanceRateColor} w-full"
                         value={collegeInfo.CalculatedFields.AcceptanceRate}
                         max="100"
                     ></progress>
