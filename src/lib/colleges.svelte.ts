@@ -5,14 +5,56 @@ export enum ApplicationStatus {
 	Deferred
 }
 
-export class College {
-	id: number;
-	status: ApplicationStatus = $state(ApplicationStatus.Pending);
+export enum SupplementalType {
+	Essay,
+	Resume,
+	Portfolio
+}
 
-	constructor(id: number) {
-		this.id = $state(id);
+export class Supplemental {
+	name: string;
+	type: SupplementalType;
+	link: string;
+
+	constructor(name: string, type: SupplementalType, link: string) {
+		this.name = $state(name);
+		this.type = $state(type);
+		this.link = $state(link);
 	}
-	setCollegeData() {}
+
+	toJSON(): object {
+		return {
+			name: this.name,
+			type: this.type,
+			link: this.link
+		};
+	}
+}
+
+export class College {
+	collegeId: number;
+	status: ApplicationStatus = $state(ApplicationStatus.Pending);
+	supplementals: Supplemental[] = $state([]);
+
+	constructor(collegeId: number) {
+		this.collegeId = collegeId;
+	}
+
+	static fromJSON(json: any): College {
+		const college = new College(json.collegeId);
+		college.status = json.status;
+		for (const sup of json.supplementals) {
+			college.supplementals.push(new Supplemental(sup.name, sup.type, sup.link));
+		}
+		return college;
+	}
+
+	toJSON(): object {
+		return {
+			collegeId: this.collegeId,
+			status: this.status
+		};
+	}
 }
 
 export interface CollegeIdPair {
@@ -130,6 +172,31 @@ export interface CollegeInfo {
 		};
 	};
 	ApplicationRounds: { Name: string; Type: string; DueDate: DueDate; Binding: boolean }[];
+}
+
+export enum SupplementalRequired {
+	NotSpecified,
+	NotRequired,
+	Conditional,
+	Optional,
+	Required
+}
+
+export function isSupplementalRequired(supplemental: Value): SupplementalRequired {
+	switch (supplemental.Value) {
+		case "NotSpecified":
+			return SupplementalRequired.NotSpecified;
+		case "NotRequired":
+			return SupplementalRequired.NotRequired;
+		case "Conditional":
+			return SupplementalRequired.Conditional;
+		case "Optional":
+			return SupplementalRequired.Optional;
+		case "Required":
+			return SupplementalRequired.Required;
+		default:
+			return SupplementalRequired.NotSpecified;
+	}
 }
 
 class CollegeInfoManager {

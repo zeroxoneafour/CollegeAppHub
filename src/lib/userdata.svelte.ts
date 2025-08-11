@@ -10,16 +10,18 @@ export class UserData {
 			readOnly: this.readOnly
 		};
 	}
-}
 
-const userData = new UserData();
-export default userData;
-
-export function loadUserData(dataStr: string) {
-	let data = JSON.parse(dataStr);
-	for (const d in data) {
-		(userData as any)[d] = data[d];
+	loadUserData(dataStr: string) {
+		this.colleges = [];
+		let data = JSON.parse(dataStr);
+		for (const college of data.colleges) {
+			this.colleges.push(College.fromJSON(college));
+		}
+		this.readOnly = data.readOnly;
 	}
+
+	saveUserData() {}
 }
 
-export function saveUserData(data: UserData) {}
+const userData = $state(new UserData());
+export default userData;
