@@ -1,4 +1,4 @@
-import { College } from "./colleges.svelte";
+import { College, type CollegeInfo } from "./colleges.svelte";
 
 export class UserData {
 	colleges: College[] = $state([]);

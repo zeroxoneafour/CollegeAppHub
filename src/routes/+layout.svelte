@@ -16,7 +16,7 @@
 </svelte:head>
 
 <div class="flex h-screen w-screen flex-col bg-base-100">
-	<div class="navbar justify-center gap-10 bg-base-100 px-10 shadow-sm">
+	<div class="navbar justify-center gap-10 bg-base-100 px-10 shadow-sm sticky top-0 z-10">
 		<a href="/" class="text-xl font-semibold">College App Hub</a>
 		<div class="flex-1"></div>
 		<a class="btn" href="/addcollege">Add College</a>

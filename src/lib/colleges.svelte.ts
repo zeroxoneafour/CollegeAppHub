@@ -35,9 +35,11 @@ export class College {
 	collegeId: number;
 	status: ApplicationStatus = $state(ApplicationStatus.Pending);
 	supplementals: Supplemental[] = $state([]);
+	collegeInfo: CollegeInfo | null = $state(null);
 
 	constructor(collegeId: number) {
 		this.collegeId = collegeId;
+		collegeInfoManager.getCollegeInfo(collegeId).then((info) => (this.collegeInfo = info));
 	}
 
 	static fromJSON(json: any): College {
@@ -249,7 +251,8 @@ class CollegeInfoManager {
 		return matches.slice(0, 5);
 	}
 
-	async fetchCollegeInfo(id: number): Promise<CollegeInfo> {
+	async getCollegeInfo(id: number): Promise<CollegeInfo> {
+		if (this.collegeInfo.has(id)) return this.collegeInfo.get(id)!;
 		let res = await fetch("/colleges/" + id + ".json");
 		let collegeInfo = (await res.json()) as CollegeInfo;
 		this.collegeInfo.set(id, collegeInfo);
