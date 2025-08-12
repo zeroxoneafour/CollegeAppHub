@@ -9,6 +9,10 @@
 </script>
 
 <div class="flex w-full flex-col items-center gap-10">
+	<div class="flex flex-row items-center">
+		<p class="w-20">Application link -</p>
+		<input type="url" class="input" bind:value={college.applicationLink} placeholder="Application Link" />
+	</div>
 	<div class="flex flex-col gap-10 md:flex-row">
 		<h1 class="text-4xl">Supplementals</h1>
 		<button class="btn" onclick={addSupplemental}>Add Supplemental</button>

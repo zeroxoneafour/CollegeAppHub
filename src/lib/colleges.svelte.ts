@@ -37,6 +37,7 @@ export class College {
 	status: ApplicationStatus = $state(ApplicationStatus.Pending);
 	supplementals: Supplemental[] = $state([]);
 	collegeInfo: CollegeInfo | null = $state(null);
+	applicationLink: string = $state("");
 
 	constructor(collegeId: number) {
 		this.collegeId = collegeId;
@@ -49,6 +50,7 @@ export class College {
 		college.supplementals =
 			json.supplementals?.map((x: any) => new Supplemental(x.name, x.type, x.link)) ??
 			college.supplementals;
+		college.applicationLink = json.applicationLink ?? college.applicationLink;
 		return college;
 	}
 
@@ -56,7 +58,8 @@ export class College {
 		return {
 			collegeId: this.collegeId,
 			status: this.status,
-			supplementals: this.supplementals.map((x) => x.toJSON())
+			supplementals: this.supplementals.map((x) => x.toJSON()),
+			applicationLink: this.applicationLink,
 		};
 	}
 }

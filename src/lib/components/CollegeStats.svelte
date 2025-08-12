@@ -111,7 +111,7 @@
 		</div>
 	{/if}
 	{#if totalSupplementals > 0}
-		<div class="flex flex-col items-center justify-center gap-10 md:flex-row">
+		<div class="flex flex-col items-center justify-center {inline ? "gap-2" : "gap-10"} md:flex-row">
 			{#if requiredSupplementals.length > 0}
 				<p class="text-center text-xs">
 					Required- {requiredSupplementals.join(", ")}

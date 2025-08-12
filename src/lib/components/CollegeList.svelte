@@ -5,10 +5,12 @@
     let { userData }: { userData: UserData } = $props();
 </script>
 
-<ul class="w-full">
+<ul class="list w-full">
     {#each userData.colleges as college}
-        <li class="w-full">
-            <CollegeDisplay {college} {userData}></CollegeDisplay>
+        <li class="list-row w-full">
+            <div class="list-col-grow">
+                <CollegeDisplay {college} {userData}></CollegeDisplay>
+            </div>
         </li>
     {/each}
 </ul>
