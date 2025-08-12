@@ -1,14 +1,7 @@
 import { College } from "./colleges.svelte";
 import { browser } from "$app/environment";
 
-export interface UserData {
-	colleges: College[];
-	readOnly: boolean;
-	satScore: number;
-	actScore: number;
-}
-
-export class RealUserData implements UserData {
+export class UserData {
 	colleges: College[] = $state([]);
 	readOnly: boolean = $state(false);
 	satScore: number = $state(1300);
@@ -47,5 +40,18 @@ export class RealUserData implements UserData {
 	}
 }
 
-const userData = $state(new RealUserData());
-export default userData;
+const mainUserData = $state(new UserData());
+
+class UserDataManager {
+	data: Map<string, UserData> = new Map();
+
+	get(id: string): UserData {
+		if (this.data.has(id)) return this.data.get(id)!;
+		const newData = new UserData();
+		this.data.set(id, newData);
+		return newData;
+	}
+}
+
+export const userDataManager = new UserDataManager();
+export default mainUserData;

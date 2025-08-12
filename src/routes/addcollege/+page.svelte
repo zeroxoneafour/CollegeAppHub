@@ -2,7 +2,7 @@
 	import { collegeInfoManager, College, type CollegeInfo } from "$lib/colleges.svelte";
 	import { goto } from "$app/navigation";
 	import CollegeEditor from "$lib/components/CollegeEditor.svelte";
-	import userData from "$lib/userdata.svelte";
+	import mainUserData from "$lib/userdata.svelte";
 	import CollegeStats from "$lib/components/CollegeStats.svelte";
 
 	let collegeSearch = $state("");
@@ -21,7 +21,7 @@
 
 	function addCollege() {
 		if (college != undefined) {
-			userData.colleges.push(college);
+			mainUserData.colleges.push(college);
 		}
 		goto("/");
 	}
@@ -56,9 +56,9 @@
 	</div>
 	{#if college != undefined}
 		{#if collegeInfo != null}
-			<CollegeStats {collegeInfo} {userData}></CollegeStats>
+			<CollegeStats {collegeInfo} userData={mainUserData}></CollegeStats>
 		{/if}
-		<CollegeEditor {college}></CollegeEditor>
+		<CollegeEditor {college} userData={mainUserData}></CollegeEditor>
 		<button class="btn" onclick={addCollege}>Add College</button>
 	{:else}
 		<a class="btn" href="/">Back</a>

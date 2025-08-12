@@ -1,6 +1,10 @@
-import userData from "$lib/userdata.svelte.js";
+import mainUserData, { userDataManager } from "$lib/userdata.svelte";
 
 export function load({ params, url }) {
 	let collegeIndex = url.searchParams.get("index");
-	return { college: userData.colleges.at(Number(collegeIndex)) };
+	let userData = mainUserData;
+	if (url.searchParams.has("userData")) {
+		userData = userDataManager.get(url.searchParams.get("userData")!);
+	}
+	return { college: userData.colleges.at(Number(collegeIndex)), userData: userData };
 }

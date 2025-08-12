@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { College, Supplemental, SupplementalType } from "$lib/colleges.svelte";
-	let { college }: { college: College } = $props();
+	import { UserData } from "$lib/userdata.svelte";
+	let { college, userData }: { college: College, userData: UserData } = $props();
 
 	function addSupplemental() {
 		college.supplementals.push(new Supplemental("", SupplementalType.Essay, ""));

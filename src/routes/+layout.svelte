@@ -25,7 +25,7 @@
 			><span class="iconify text-2xl tabler--settings"></span></a
 		>
 	</div>
-	<div class="grow-1">
+	<div class="grow-1 w-full">
 		{@render children?.()}
 	</div>
 </div>
