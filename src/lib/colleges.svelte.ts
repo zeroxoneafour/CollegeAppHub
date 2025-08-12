@@ -2,7 +2,8 @@ export enum ApplicationStatus {
 	Pending,
 	Accepted,
 	Rejected,
-	Deferred
+	Deferred,
+	Committed
 }
 
 export enum SupplementalType {
@@ -43,18 +44,19 @@ export class College {
 	}
 
 	static fromJSON(json: any): College {
-		const college = new College(json.collegeId);
-		college.status = json.status;
-		for (const sup of json.supplementals) {
-			college.supplementals.push(new Supplemental(sup.name, sup.type, sup.link));
-		}
+		const college = new College(json.collegeId ?? 0);
+		college.status = json.status ?? college.status;
+		college.supplementals =
+			json.supplementals?.map((x: any) => new Supplemental(x.name, x.type, x.link)) ??
+			college.supplementals;
 		return college;
 	}
 
 	toJSON(): object {
 		return {
 			collegeId: this.collegeId,
-			status: this.status
+			status: this.status,
+			supplementals: this.supplementals.map((x) => x.toJSON())
 		};
 	}
 }

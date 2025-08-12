@@ -1,7 +1,14 @@
-import { College, type CollegeInfo } from "./colleges.svelte";
+import { College } from "./colleges.svelte";
 import { browser } from "$app/environment";
 
-export class UserData {
+export interface UserData {
+	colleges: College[];
+	readOnly: boolean;
+	satScore: number;
+	actScore: number;
+}
+
+export class RealUserData implements UserData {
 	colleges: College[] = $state([]);
 	readOnly: boolean = $state(false);
 	satScore: number = $state(1300);
@@ -12,30 +19,33 @@ export class UserData {
 			colleges: this.colleges,
 			readOnly: this.readOnly,
 			satScore: this.satScore,
-			actScore: this.actScore,
+			actScore: this.actScore
 		};
 	}
 
-	loadUserData() {
-		if (!browser) return;
-		const dataStr = window.localStorage.getItem("userData");
-		if (dataStr == null) return;
-		let data = JSON.parse(dataStr);
-		/*
-		if (data.colleges != undefined) {
-			this.colleges = [];
-			for (const college of data.colleges) {
-				this.colleges.push(College.fromJSON(college));
-			}
-		}
-		if (data.readOnly != undefined) this.readOnly = data.readOnly;*/
+	toString(): string {
+		return JSON.stringify(this.toJSON());
 	}
 
-	saveUserData() {
+	loadUserData(dataStr: string) {
+		let data = JSON.parse(dataStr);
+
+		this.colleges = data.colleges?.map((x: object) => College.fromJSON(x)) ?? this.colleges;
+		this.readOnly = data.readOnly ?? this.readOnly;
+		this.satScore = data.satScore ?? this.satScore;
+		this.actScore = data.actScore ?? this.actScore;
+	}
+
+	loadLocalStorage() {
 		if (!browser) return;
-		window.localStorage.setItem("userData", JSON.stringify(this.toJSON()));
+		this.loadUserData(window.localStorage.getItem("userData") ?? "{}");
+	}
+
+	saveLocalStorage() {
+		if (!browser) return;
+		window.localStorage.setItem("userData", this.toString());
 	}
 }
 
-const userData = $state(new UserData());
+const userData = $state(new RealUserData());
 export default userData;

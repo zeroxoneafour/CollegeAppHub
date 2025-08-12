@@ -1,11 +1,9 @@
 <script lang="ts">
-	import {
-		collegeInfoManager,
-		College
-	} from "$lib/colleges.svelte";
+	import { collegeInfoManager, College, type CollegeInfo } from "$lib/colleges.svelte";
 	import { goto } from "$app/navigation";
 	import CollegeEditor from "$lib/components/CollegeEditor.svelte";
 	import userData from "$lib/userdata.svelte";
+	import CollegeStats from "$lib/components/CollegeStats.svelte";
 
 	let collegeSearch = $state("");
 	let collegeSearchBar: HTMLInputElement = $state()!;
@@ -14,6 +12,7 @@
 	});
 
 	let college: College | undefined = $state();
+	let collegeInfo: CollegeInfo | null = $derived(college?.collegeInfo ?? null);
 
 	function setCollegeId(id: number) {
 		collegeSearch = collegeInfoManager.collegeRealNames.get(id)!;
@@ -28,9 +27,9 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col items-center gap-10">
-	<p class="mt-10 text-4xl">New College</p>
-	<div class="dropdown dropdown-center w-1/3">
+<div class="flex h-full w-full flex-col items-center gap-10 p-10">
+	<p class="text-4xl">New College</p>
+	<div class="dropdown dropdown-center w-1/3 min-w-80">
 		<label class="input w-full">
 			<svg class="iconify tabler--search" />
 			<input
@@ -56,6 +55,9 @@
 		{/if}
 	</div>
 	{#if college != undefined}
+		{#if collegeInfo != null}
+			<CollegeStats {collegeInfo} {userData}></CollegeStats>
+		{/if}
 		<CollegeEditor {college}></CollegeEditor>
 		<button class="btn" onclick={addCollege}>Add College</button>
 	{:else}

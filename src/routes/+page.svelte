@@ -6,7 +6,7 @@
 {#if userData.colleges.length > 0}
 	<div class="flex flex-col items-center">
 		{#each userData.colleges as college}
-			<CollegeDisplay {college}></CollegeDisplay>
+			<CollegeDisplay {college} {userData}></CollegeDisplay>
 		{/each}
 	</div>
 {:else}
