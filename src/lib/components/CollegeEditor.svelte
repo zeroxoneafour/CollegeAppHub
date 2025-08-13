@@ -1,7 +1,10 @@
 <script lang="ts">
-	import { College, Supplemental, SupplementalType } from "$lib/colleges.svelte";
+	import { College, dueDateToDate, Supplemental, SupplementalType } from "$lib/colleges.svelte";
 	import { UserData } from "$lib/userdata.svelte";
+	import DatePicker from "./ui/DatePicker.svelte";
 	let { college, userData }: { college: College, userData: UserData } = $props();
+
+	let collegeInfo = $derived(college.collegeInfo);
 
 	function addSupplemental() {
 		college.supplementals.push(new Supplemental("", SupplementalType.Essay, ""));
@@ -9,9 +12,27 @@
 </script>
 
 <div class="flex w-full flex-col items-center gap-10">
-	<div class="flex flex-row items-center">
-		<p class="w-20">Application link -</p>
-		<input type="url" class="input" bind:value={college.applicationLink} placeholder="Application Link" />
+	<div class="grid grid-cols-2 gap-2">
+		<p class="text-nowrap text-lg w-full h-full flex justify-end items-center">Application link -</p>
+		<div class="tooltip w-full h-full">
+			{#if collegeInfo != null && collegeInfo.WwwUrl != ""}
+				<div class="tooltip-content">
+					<p>Main college URL - {collegeInfo.WwwUrl}</p>
+				</div>
+			{/if}
+			<input type="url" class="input" bind:value={college.applicationLink} placeholder="Application Link" />
+		</div>
+		<p class="text-nowrap text-lg w-full h-full flex justify-end items-center">Application Due Date -</p>
+		<div class="tooltip w-full h-full">
+			{#if collegeInfo != null && collegeInfo.ApplicationRounds.length > 0}
+				<div class="tooltip-content">
+					{#each collegeInfo.ApplicationRounds as round}
+						<p>{round.Name} - {dueDateToDate(round.DueDate).toDateString()}{round.Binding ? " (Binding)" : ""}</p>
+					{/each}
+				</div>
+			{/if}
+			<DatePicker bind:date={college.dueDate}></DatePicker>
+		</div>
 	</div>
 	<div class="flex flex-col gap-10 md:flex-row">
 		<h1 class="text-4xl">Supplementals</h1>

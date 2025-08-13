@@ -5,7 +5,7 @@
 		SupplementalRequired,
 		isSupplementalRequired
 	} from "$lib/colleges.svelte";
-	import { type UserData } from "$lib/userdata.svelte";
+	import { UserData } from "$lib/userdata.svelte";
 
 	let {
 		collegeInfo,

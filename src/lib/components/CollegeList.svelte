@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { UserData } from "$lib/userdata.svelte";
+	import { UserData } from "$lib/userdata.svelte";
 	import CollegeDisplay from "./CollegeDisplay.svelte";
 
     let { userData }: { userData: UserData } = $props();

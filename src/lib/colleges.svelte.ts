@@ -38,6 +38,7 @@ export class College {
 	supplementals: Supplemental[] = $state([]);
 	collegeInfo: CollegeInfo | null = $state(null);
 	applicationLink: string = $state("");
+	dueDate: DueDate = $state({ Month: 0, Day: 1 });
 
 	constructor(collegeId: number) {
 		this.collegeId = collegeId;
@@ -73,9 +74,29 @@ export interface Value {
 	Value: string;
 }
 
+// day is 1-31
+// month is 1-11
 export interface DueDate {
 	Day: number;
 	Month: number;
+}
+
+// if date month < this and current month > this, set to next year (for school year)
+// 7 == july
+const dueDateCutoff = 7;
+
+export function dueDateToDate(dueDate: DueDate): Date {
+	let date = new Date();
+	let targetYear = date.getFullYear();
+	// 1-indexed months
+	let currentMonth = date.getMonth() + 1;
+	if (dueDate.Month < dueDateCutoff && currentMonth > dueDateCutoff) {
+		targetYear += 1;
+	} else if (dueDate.Month > dueDateCutoff && currentMonth < dueDateCutoff) {
+		targetYear -= 1;
+	}
+	date.setFullYear(targetYear, dueDate.Month - 1, dueDate.Day);
+	return date;
 }
 
 export interface CollegeInfo {

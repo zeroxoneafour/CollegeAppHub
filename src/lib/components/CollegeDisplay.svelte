@@ -8,6 +8,11 @@
 	let collegeInfo = $derived(college.collegeInfo);
 
 	let collegeInfoOpen = $state(false);
+	let collegeDeleteMenuOpen = $state(false);
+	function deleteCollege() {
+		collegeDeleteMenuOpen = false;
+		userData.colleges.splice(collegeIndex, 1);
+	}
 	// required for displaying things over other collegedisplays (ex. tooltips)
 	let isFocused = $state(false);
 
@@ -62,13 +67,13 @@
 						href="/editcollege?index={collegeIndex}"
 						aria-label="Edit college"><span class="iconify tabler--pencil"></span></a
 					>
-					<details class="dropdown dropdown-left">
+					<details class="dropdown dropdown-left" bind:open={collegeDeleteMenuOpen}>
 						<summary>
 							<div class="btn btn-square btn-sm">
 								<span class="iconify tabler--trash"></span>
 							</div>
 						</summary>
-						<button class="btn dropdown-content z-10 w-50" onclick={() => userData.colleges.splice(collegeIndex, 1)}>Really delete?</button>
+						<button class="btn dropdown-content z-10 w-50 mr-2" onclick={deleteCollege}>Really delete?</button>
 					</details>
 				{/if}
 			</div>
