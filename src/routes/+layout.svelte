@@ -17,13 +17,16 @@
 </svelte:head>
 
 <div class="flex h-screen w-screen flex-col bg-base-100">
-	<div class="sticky top-0 z-10 navbar justify-center gap-10 bg-base-100 px-10 shadow-sm">
+	<div class="sticky top-0 z-10 navbar justify-center gap-5 bg-base-100 px-10 shadow-sm">
 		<a href="/" class="text-xl font-semibold">College App Hub</a>
 		<div class="flex-1"></div>
 		<a class="btn" href="/addcollege">Add College</a>
-		<a href="/settings" aria-label="Settings" class="btn btn-square"
-			><span class="iconify text-2xl tabler--settings"></span></a
-		>
+		<a href="/calendar" aria-label="Calendar" class="btn btn-square">
+			<span class="iconify text-2xl tabler--calendar"></span>
+		</a>
+		<a href="/settings" aria-label="Settings" class="btn btn-square">
+			<span class="iconify text-2xl tabler--settings"></span>
+		</a>
 	</div>
 	<div class="grow-1 w-full">
 		{@render children?.()}

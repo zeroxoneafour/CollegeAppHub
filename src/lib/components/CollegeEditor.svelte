@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { College, dueDateToDate, Supplemental, SupplementalType } from "$lib/colleges.svelte";
+	import { College, dueDateToDate, NamedDate, Supplemental, SupplementalType } from "$lib/colleges.svelte";
 	import { UserData } from "$lib/userdata.svelte";
 	import DatePicker from "./ui/DatePicker.svelte";
 	let { college, userData }: { college: College, userData: UserData } = $props();
@@ -8,6 +8,9 @@
 
 	function addSupplemental() {
 		college.supplementals.push(new Supplemental("", SupplementalType.Essay, ""));
+	}
+	function addDate() {
+		college.dates.push(new NamedDate("", { Month: 1, Day: 1 }));
 	}
 </script>
 
@@ -27,7 +30,7 @@
 			{#if collegeInfo != null && collegeInfo.ApplicationRounds.length > 0}
 				<div class="tooltip-content">
 					{#each collegeInfo.ApplicationRounds as round}
-						<p>{round.Name} - {dueDateToDate(round.DueDate).toDateString()}{round.Binding ? " (Binding)" : ""}</p>
+						<p>{round.Name} - {dueDateToDate(round.DueDate).toLocaleDateString()}{round.Binding ? " (Binding)" : ""}</p>
 					{/each}
 				</div>
 			{/if}
@@ -65,6 +68,27 @@
 						class="btn btn-square self-end"
 						onclick={() =>
 							college.supplementals.splice(college.supplementals.indexOf(supplemental), 1)}
+						><span class="iconify tabler--trash"></span></button
+					>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+	<div class="flex flex-col gap-10 md:flex-row">
+		<h1 class="text-4xl">Dates</h1>
+		<button class="btn" onclick={addDate}>Add Date</button>
+	</div>
+	{#if college.dates.length > 0}
+		<ul class="list">
+			{#each college.dates as date}
+				<li class="list-row">
+					<input class="input list-col-grow" type="text" bind:value={date.name} placeholder="Date name" />
+					<DatePicker bind:date={date.date}></DatePicker>
+					<button
+						aria-label="Delete date"
+						class="btn btn-square self-end"
+						onclick={() =>
+							college.dates.splice(college.dates.indexOf(date), 1)}
 						><span class="iconify tabler--trash"></span></button
 					>
 				</li>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ApplicationStatus, College, SupplementalType } from "$lib/colleges.svelte";
+	import { ApplicationStatus, College, SupplementalType, dueDateToDate } from "$lib/colleges.svelte";
 	import { type UserData } from "$lib/userdata.svelte";
 	import CollegeStats from "./CollegeStats.svelte";
 
@@ -29,6 +29,8 @@
 	let essaySupplementals = $derived(college.supplementals.filter((x) => x.type == SupplementalType.Essay));
 	let portfolioSupplementals = $derived(college.supplementals.filter((x) => x.type == SupplementalType.Portfolio));
 	let resumeSupplementals = $derived(college.supplementals.filter((x) => x.type == SupplementalType.Resume));
+
+	let dueDate = $derived(dueDateToDate(college.dueDate).toLocaleDateString());
 </script>
 
 <!-- TAILWIND bg-base-300 bg-info bg-success bg-warning bg-error -->
@@ -79,13 +81,17 @@
 			</div>
 		</summary>
 		<div class="collapse-content flex flex-row">
-			<div class="flex flex-row items-center gap-5">
+			<div class="flex flex-row items-center gap-8">
 				{#if college.applicationLink != ""}
 					<a class="btn" href={college.applicationLink} target="_blank">Application Link</a>
 				{/if}
 				<div class="flex flex-col items-center">
+					<p>Due Date</p>
+					<p>{dueDate}</p>
+				</div>
+				<div class="flex flex-col items-center">
 					<p>Application Status</p>
-					<select class="select" bind:value={college.status}>
+					<select class="select" bind:value={college.status} disabled={userData.readOnly}>
 						<option value={ApplicationStatus.Accepted}>Accepted</option>
 						<option value={ApplicationStatus.Committed}>Committed</option>
 						<option value={ApplicationStatus.Deferred}>Deferred</option>
@@ -119,6 +125,12 @@
 						</div>
 					{/if}
 				</div>
+				{#each college.dates as date}
+					<div class="flex flex-col items-center justify-center">
+						<p>{date.name} -</p>
+						<p>{dueDateToDate(date.date).toLocaleDateString()}</p>
+					</div>
+				{/each}
 			</div>
 		</div>
 	</details>

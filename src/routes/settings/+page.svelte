@@ -16,14 +16,13 @@
 	</div>
 	<div class="flex flex-col items-center justify-center gap-2">
 		<p>Enter a config, or copy yours from below</p>
-		<input class="input" type="text" bind:value={configText} bind:this={configElement} />
+		<input class="input" type="text" onclick={() => (configElement!.select())} bind:value={configText} bind:this={configElement} />
 		<div class="flex flex-row gap-2">
 			<button
 				class="btn"
-				onclick={() => {
-					configText = userData.toString();
-					if (configElement !== undefined) configElement.select();
-				}}>Export config</button
+				onclick={() => (
+					configText = userData.toString()
+				)}>Export config</button
 			>
 			<button class="btn" onclick={() => userData.loadUserData(configText)}>Import config</button>
 		</div>

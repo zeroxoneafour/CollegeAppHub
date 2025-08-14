@@ -32,13 +32,31 @@ export class Supplemental {
 	}
 }
 
+export class NamedDate {
+	name: string = $state("");
+	date: DueDate = $state({ Month: 1, Day: 1 });
+
+	constructor(name: string, date: DueDate) {
+		this.name = name;
+		this.date = date;
+	}
+
+	toJSON(): object {
+		return {
+			name: this.name,
+			date: this.date
+		};
+	}
+}
+
 export class College {
 	collegeId: number;
 	status: ApplicationStatus = $state(ApplicationStatus.Pending);
 	supplementals: Supplemental[] = $state([]);
 	collegeInfo: CollegeInfo | null = $state(null);
 	applicationLink: string = $state("");
-	dueDate: DueDate = $state({ Month: 0, Day: 1 });
+	dueDate: DueDate = $state({ Month: 1, Day: 1 });
+	dates: NamedDate[] = $state([]);
 
 	constructor(collegeId: number) {
 		this.collegeId = collegeId;
@@ -52,6 +70,8 @@ export class College {
 			json.supplementals?.map((x: any) => new Supplemental(x.name, x.type, x.link)) ??
 			college.supplementals;
 		college.applicationLink = json.applicationLink ?? college.applicationLink;
+		college.dueDate = json.dueDate ?? college.dueDate;
+		college.dates = json.dates?.map((x: any) => new NamedDate(x.name, x.date)) ?? college.dates;
 		return college;
 	}
 
@@ -61,6 +81,8 @@ export class College {
 			status: this.status,
 			supplementals: this.supplementals.map((x) => x.toJSON()),
 			applicationLink: this.applicationLink,
+			dueDate: this.dueDate,
+			dates: this.dates.map((x) => x.toJSON()),
 		};
 	}
 }
@@ -83,7 +105,7 @@ export interface DueDate {
 
 // if date month < this and current month > this, set to next year (for school year)
 // 7 == july
-const dueDateCutoff = 7;
+export const dueDateCutoff = 7;
 
 export function dueDateToDate(dueDate: DueDate): Date {
 	let date = new Date();
