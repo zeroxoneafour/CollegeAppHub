@@ -1,8 +1,12 @@
 <script lang="ts">
+	import firebaseManager from "$lib/firebase.svelte";
 	import userData from "$lib/userdata.svelte";
 
 	let configText: string = $state("");
 	let configElement: HTMLInputElement | undefined = $state();
+
+	let email = $state("");
+	let password = $state("");
 </script>
 
 <div class="flex h-full w-full flex-col items-center justify-center gap-5">
@@ -13,17 +17,29 @@
 		<input type="number" class="input" min="1" max="36" bind:value={userData.actScore} />
 		<p class="flex h-full items-center">SAT Score</p>
 		<input type="number" class="input" min="1" max="1600" bind:value={userData.satScore} />
+		<p class="flex h-full items-center">Email</p>
+		<input type="text" class="input" bind:value={email} />
+		<p class="flex h-full items-center">Password</p>
+		<input type="password" class="input" bind:value={password} />
+	</div>
+	<div class="flex flex-row gap-2">
+		<button class="btn" onclick={() => firebaseManager.logInOrSignUp(email, password)}
+			>Sign up/log in</button
+		>
+		<button class="btn" disabled={firebaseManager.user == null}>Upload Config</button>
+		<button class="btn" disabled={firebaseManager.user == null}>Download Config</button>
 	</div>
 	<div class="flex flex-col items-center justify-center gap-2">
 		<p>Enter a config, or copy yours from below</p>
-		<input class="input" type="text" onclick={() => (configElement!.select())} bind:value={configText} bind:this={configElement} />
+		<input
+			class="input"
+			type="text"
+			onclick={() => configElement!.select()}
+			bind:value={configText}
+			bind:this={configElement}
+		/>
 		<div class="flex flex-row gap-2">
-			<button
-				class="btn"
-				onclick={() => (
-					configText = userData.toString()
-				)}>Export config</button
-			>
+			<button class="btn" onclick={() => (configText = userData.toString())}>Export config</button>
 			<button class="btn" onclick={() => userData.loadUserData(configText)}>Import config</button>
 		</div>
 	</div>

@@ -3,7 +3,7 @@
 A college application process tracker, featuring -
 
 - [x] - College statistics (scraped from SCOIR)
-- [ ] - College application status
+- [x] - College application status
 - [x] - Application result sharing
 - [ ] - Web saving
 - [x] - Supplemental management
