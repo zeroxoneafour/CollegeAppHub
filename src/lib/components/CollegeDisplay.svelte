@@ -3,7 +3,11 @@
 	import { type UserData } from "$lib/userdata.svelte";
 	import CollegeStats from "./CollegeStats.svelte";
 
-	let { college, userData }: { college: College; userData: UserData } = $props();
+	let {
+		college,
+		userData,
+		readonly = false
+	}: { college: College; userData: UserData; readonly: boolean } = $props();
 	let collegeIndex = userData.colleges.indexOf(college);
 	let collegeInfo = $derived(college.collegeInfo);
 
@@ -71,7 +75,7 @@
 						</div>
 					</details>
 				{/if}
-				{#if !userData.readOnly}
+				{#if !readonly}
 					<a
 						class="btn btn-square btn-sm"
 						href="/editcollege?index={collegeIndex}"
@@ -101,7 +105,7 @@
 				</div>
 				<div class="flex flex-col items-center">
 					<p>Application Status</p>
-					<select class="select" bind:value={college.status} disabled={userData.readOnly}>
+					<select class="select" bind:value={college.status} disabled={readonly}>
 						<option value={ApplicationStatus.Accepted}>Accepted</option>
 						<option value={ApplicationStatus.Committed}>Committed</option>
 						<option value={ApplicationStatus.Deferred}>Deferred</option>

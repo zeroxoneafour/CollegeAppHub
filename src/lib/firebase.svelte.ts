@@ -20,7 +20,7 @@ import {
 } from "firebase/database";
 
 import { initializeAnalytics, type Analytics } from "firebase/analytics";
-import mainUserData from "./userdata.svelte";
+import mainUserData, { UserData } from "./userdata.svelte";
 
 class FirebaseManager {
 	app: FirebaseApp;
@@ -62,12 +62,15 @@ class FirebaseManager {
 
 	async loadMainUserData() {
 		if (this.user == null) return null;
-		const publicUpload = mainUserData.publicUpload;
 
-		const dbPath = (publicUpload ? "public_data/" : "private_data/") + this.user.uid;
-		const snapshot = await dbGet(child(ref(this.database), dbPath));
-		if (snapshot.exists()) {
-			mainUserData.loadJSON(snapshot.val());
+		// check both public and private data for config download
+		for (const path of ["private_data/", "public_data/"]) {
+			const dbPath = path + this.user.uid;
+			const snapshot = await dbGet(child(ref(this.database), dbPath));
+			if (snapshot.exists()) {
+				mainUserData.loadJSON(snapshot.val());
+				return;
+			}
 		}
 	}
 
@@ -81,6 +84,15 @@ class FirebaseManager {
 		// remove old data in case switching from public to private or vice versa
 		const otherDbPath = (publicUpload ? "private_data/" : "public_data/") + this.user.uid;
 		remove(ref(this.database, otherDbPath));
+	}
+
+	async fetchUserData(uid: string): Promise<UserData | null> {
+		const path = "public_data/" + uid;
+		const snapshot = await dbGet(child(ref(this.database), path));
+		if (snapshot.exists()) {
+			return UserData.fromJSON(snapshot.val());
+		}
+		return null;
 	}
 }
 

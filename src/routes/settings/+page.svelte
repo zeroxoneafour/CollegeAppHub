@@ -7,12 +7,12 @@
 
 	let email = $state("");
 	let password = $state("");
+
+	let shareUrlElement: HTMLInputElement | undefined = $state();
 </script>
 
 <div class="flex h-full w-full flex-col items-center justify-center gap-5">
 	<div class="grid grid-cols-2 gap-2">
-		<p class="flex h-full items-center">Read Only</p>
-		<input class="toggle" type="checkbox" bind:checked={userData.readOnly} />
 		<p class="flex h-full items-center">ACT Score</p>
 		<input type="number" class="input" min="1" max="36" bind:value={userData.actScore} />
 		<p class="flex h-full items-center">SAT Score</p>
@@ -23,6 +23,15 @@
 		<input type="password" class="input" bind:value={password} />
 		<p class="flex h-full items-center">Public Upload</p>
 		<input class="toggle" type="checkbox" bind:checked={userData.publicUpload} />
+		{#if firebaseManager.user != null && userData.publicUpload}
+			<p class="flex h-full items-center">Share link</p>
+			<input
+				value={window.location.origin + "/view/?uid=" + firebaseManager.user.uid}
+				class="input"
+				bind:this={shareUrlElement}
+				onclick={() => shareUrlElement!.select()}
+			/>
+		{/if}
 	</div>
 	<div class="flex flex-row gap-2">
 		<button class="btn" onclick={() => firebaseManager.logInOrSignUp(email, password)}

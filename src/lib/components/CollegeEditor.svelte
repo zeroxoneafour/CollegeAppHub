@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { College, NamedDate, Supplemental, SupplementalType } from "$lib/colleges.svelte";
-	import { UserData } from "$lib/userdata.svelte";
 	import DatePicker from "./ui/DatePicker.svelte";
-	let { college, userData }: { college: College; userData: UserData } = $props();
+	let { college }: { college: College } = $props();
 
 	let collegeInfo = $derived(college.collegeInfo);
 

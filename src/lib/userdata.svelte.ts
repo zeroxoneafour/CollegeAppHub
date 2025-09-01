@@ -1,8 +1,8 @@
 import { College } from "./colleges.svelte";
+import firebaseManager from "./firebase.svelte";
 
 export class UserData {
 	colleges: College[] = $state([]);
-	readOnly: boolean = $state(false);
 	satScore: number = $state(1300);
 	actScore: number = $state(28);
 	publicUpload: boolean = $state(false);
@@ -10,7 +10,6 @@ export class UserData {
 	toJSON(): object {
 		return {
 			colleges: this.colleges.map((x) => x.toJSON()),
-			readOnly: this.readOnly,
 			satScore: this.satScore,
 			actScore: this.actScore,
 			publicUpload: this.publicUpload
@@ -19,7 +18,6 @@ export class UserData {
 
 	loadJSON(json: any) {
 		this.colleges = json.colleges?.map((x: object) => College.fromJSON(x)) ?? this.colleges;
-		this.readOnly = json.readOnly ?? this.readOnly;
 		this.satScore = json.satScore ?? this.satScore;
 		this.actScore = json.actScore ?? this.actScore;
 		this.publicUpload = json.publicUpload ?? this.publicUpload;
@@ -41,9 +39,10 @@ const mainUserData = $state(new UserData());
 class UserDataManager {
 	data: Map<string, UserData> = new Map();
 
-	get(id: string): UserData {
+	async get(id: string): Promise<UserData | null> {
 		if (this.data.has(id)) return this.data.get(id)!;
-		const newData = new UserData();
+		const newData = await firebaseManager.fetchUserData(id);
+		if (newData == null) return null;
 		this.data.set(id, newData);
 		return newData;
 	}

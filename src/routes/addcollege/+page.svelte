@@ -59,7 +59,7 @@
 		{#if collegeInfo != null}
 			<CollegeStats {collegeInfo} userData={mainUserData}></CollegeStats>
 		{/if}
-		<CollegeEditor {college} userData={mainUserData}></CollegeEditor>
+		<CollegeEditor {college}></CollegeEditor>
 		<button class="btn" onclick={addCollege}>Add College</button>
 	{:else}
 		<a class="btn" href="/">Back</a>
