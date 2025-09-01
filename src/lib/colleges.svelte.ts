@@ -1,3 +1,5 @@
+import { CollegeInfo } from "./collegeinfo.svelte";
+
 export enum ApplicationStatus {
 	Pending,
 	Accepted,
@@ -34,11 +36,11 @@ export class Supplemental {
 
 export class NamedDate {
 	name: string = $state("");
-	date: DueDate = $state({ Month: 1, Day: 1 });
+	date: Date = $state(new Date());
 
-	constructor(name: string, date: DueDate) {
+	constructor(name: string, date: Date | string) {
 		this.name = name;
-		this.date = date;
+		this.date = new Date(date);
 	}
 
 	toJSON(): object {
@@ -50,263 +52,38 @@ export class NamedDate {
 }
 
 export class College {
-	collegeId: number;
+	collegeInfo: CollegeInfo = $state(new CollegeInfo());
+
 	status: ApplicationStatus = $state(ApplicationStatus.Pending);
 	supplementals: Supplemental[] = $state([]);
-	collegeInfo: CollegeInfo | null = $state(null);
 	applicationLink: string = $state("");
-	dueDate: DueDate = $state({ Month: 1, Day: 1 });
+	dueDate: Date = $state(new Date());
 	dates: NamedDate[] = $state([]);
 
-	constructor(collegeId: number) {
-		this.collegeId = collegeId;
-		collegeInfoManager.getCollegeInfo(collegeId).then((info) => (this.collegeInfo = info));
+	constructor(collegeInfo: CollegeInfo) {
+		this.collegeInfo = collegeInfo;
 	}
 
 	static fromJSON(json: any): College {
-		const college = new College(json.collegeId ?? 0);
+		const college = new College(CollegeInfo.fromJSON(json.collegeInfo));
 		college.status = json.status ?? college.status;
 		college.supplementals =
 			json.supplementals?.map((x: any) => new Supplemental(x.name, x.type, x.link)) ??
 			college.supplementals;
 		college.applicationLink = json.applicationLink ?? college.applicationLink;
-		college.dueDate = json.dueDate ?? college.dueDate;
+		college.dueDate = new Date(json.dueDate) ?? college.dueDate;
 		college.dates = json.dates?.map((x: any) => new NamedDate(x.name, x.date)) ?? college.dates;
 		return college;
 	}
 
 	toJSON(): object {
 		return {
-			collegeId: this.collegeId,
+			collegeInfo: this.collegeInfo.toJSON(),
 			status: this.status,
 			supplementals: this.supplementals.map((x) => x.toJSON()),
 			applicationLink: this.applicationLink,
-			dueDate: this.dueDate,
-			dates: this.dates.map((x) => x.toJSON()),
+			dueDate: this.dueDate.toJSON(),
+			dates: this.dates.map((x) => x.toJSON())
 		};
 	}
 }
-
-export interface CollegeIdPair {
-	name: string;
-	id: number;
-}
-
-export interface Value {
-	Value: string;
-}
-
-// day is 1-31
-// month is 1-11
-export interface DueDate {
-	Day: number;
-	Month: number;
-}
-
-// if date month < this and current month > this, set to next year (for school year)
-// 7 == july
-export const dueDateCutoff = 7;
-
-export function dueDateToDate(dueDate: DueDate): Date {
-	let date = new Date();
-	let targetYear = date.getFullYear();
-	// 1-indexed months
-	let currentMonth = date.getMonth() + 1;
-	if (dueDate.Month < dueDateCutoff && currentMonth > dueDateCutoff) {
-		targetYear += 1;
-	} else if (dueDate.Month > dueDateCutoff && currentMonth < dueDateCutoff) {
-		targetYear -= 1;
-	}
-	date.setFullYear(targetYear, dueDate.Month - 1, dueDate.Day);
-	return date;
-}
-
-export interface CollegeInfo {
-	Scid: number;
-	Name: string;
-	Address: string;
-	City: string;
-	State: string;
-	Zip: string;
-	WwwUrl: string;
-	Opeid: string;
-	Opeid6: string;
-	Iped: string;
-	Setting: string;
-	Location: {
-		type: string;
-		coordinates: number[];
-	};
-	Country: string;
-	ScoirApplyEnabled: boolean;
-	DisplayAsScoirApply: boolean;
-	CoalitionMember: boolean;
-	GeneralInfo: {
-		AdmPhone: string;
-		AdmEmail: string;
-		AdmFax: string;
-		FinPhone: string;
-		FtDegree3: number;
-		HasOnCampusHousing: boolean;
-		HBCU: boolean;
-		HonorsCollege: string;
-		OthRelig: string;
-		PublicPrivate: string;
-		ResidenceCollege: boolean;
-		TotalDegree3: number;
-		UnivType: string;
-		SchoolClassifier: string;
-	};
-	FreshEnroll: {
-		NumApplEnrolled: number;
-		NumApplOffered: number;
-		NumApplReceived: number;
-	};
-	TuitionAndExpenses: {
-		FeesIndistrict: number;
-		FeesInstate: number;
-		FeesOutstate: number;
-		TuitionIndistrict: number;
-		TuitionInstate: number;
-		TuitionOutstate: number;
-		RoomBoard: number;
-		BookFees: number;
-		StickerInState: number;
-		StickerOutState: number;
-	};
-	AdmissionFreshmen: {
-		ApplicFeeAmt: number;
-	};
-	Admissions: {
-		CommonForm: string;
-		CoalitionForm: boolean;
-		CommonGroup: string;
-	};
-	FinancialAid: {
-		AverageDebt: number;
-		DebtBalanceMedian: number;
-		PcFedLoansReceived: number;
-		PcFinAidReceived: number;
-	};
-	NetPrice: {
-		NetAverage: number;
-		Income1: number;
-		Income2: number;
-		Income3: number;
-		Income4: number;
-		Income5: number;
-	};
-	CalculatedFields: {
-		AcceptanceRate: number;
-		SATMin: number;
-		SATMax: number;
-		SATAvg: number;
-		ACTAvg: number;
-		ACTMin: number;
-		ACTMax: number;
-	};
-	Sports: {};
-	Degrees: any;
-	ApplicationDetails: {
-		StandardizedTests: {
-			SATorACT: Value;
-			WithWriting: Value;
-			SubjectTests: Value;
-		};
-		SupplementalRequirements: {
-			EssayOrStatement: Value;
-			Resume: Value;
-			Portfolio: Value;
-			Interview: Value;
-			AuditionOrPortfolioReview: Value;
-		};
-	};
-	ApplicationRounds: { Name: string; Type: string; DueDate: DueDate; Binding: boolean }[];
-}
-
-export enum SupplementalRequired {
-	NotSpecified,
-	NotRequired,
-	Conditional,
-	Optional,
-	Required
-}
-
-export function isSupplementalRequired(supplemental: Value): SupplementalRequired {
-	switch (supplemental.Value) {
-		case "NotSpecified":
-			return SupplementalRequired.NotSpecified;
-		case "NotRequired":
-			return SupplementalRequired.NotRequired;
-		case "Conditional":
-			return SupplementalRequired.Conditional;
-		case "Optional":
-			return SupplementalRequired.Optional;
-		case "Required":
-			return SupplementalRequired.Required;
-		default:
-			return SupplementalRequired.NotSpecified;
-	}
-}
-
-class CollegeInfoManager {
-	collegeSearchNames: CollegeIdPair[] = [];
-	collegeAbbreviations: CollegeIdPair[] = [];
-	collegeRealNames: Map<number, string> = new Map();
-
-	collegeInfo: Map<number, CollegeInfo> = new Map();
-
-	initialize(collegeList: object) {
-		for (const [collegeName, collegeId] of Object.entries(collegeList)) {
-			// only alphanumeric lowercase, convert dashes to spaces
-			let lowercase = collegeName.split("-").join(" ");
-			lowercase = collegeName.toLocaleLowerCase().replace(/[^a-z0-9 ]/gi, "");
-			this.collegeSearchNames.push({ name: lowercase, id: collegeId });
-			let filterWords = ["of", "in", "the", "at"];
-			let abbreviation = lowercase
-				.split(" ")
-				.filter((x) => !filterWords.includes(x))
-				.reduce((acc, x) => acc + x.charAt(0), "");
-			this.collegeAbbreviations.push({ name: abbreviation, id: collegeId });
-			this.collegeRealNames.set(collegeId, collegeName);
-		}
-	}
-
-	getCollegeIdPairs(query: string) {
-		// exact matches
-		let matches = this.collegeSearchNames.filter((x) => x.name.startsWith(query));
-		if (matches.length >= 5) return matches.slice(0, 5);
-		// abbreviation matches
-		matches.push(
-			...this.collegeAbbreviations
-				.filter((x) => x.name.startsWith(query))
-				.filter((x) => !matches.some((m) => m.id === x.id))
-		);
-		if (matches.length >= 5) return matches.slice(0, 5);
-		// u shortcut
-		if (query.charAt(0) === "u") {
-			matches.push(
-				...this.collegeSearchNames
-					.filter((x) => x.name.startsWith("university of " + query.slice(1)))
-					.filter((x) => !matches.some((m) => m.id === x.id))
-			);
-		}
-		// includes
-		matches.push(
-			...this.collegeSearchNames
-				.filter((x) => x.name.includes(query))
-				.filter((x) => !matches.some((m) => m.id === x.id))
-		);
-		return matches.slice(0, 5);
-	}
-
-	async getCollegeInfo(id: number): Promise<CollegeInfo> {
-		if (this.collegeInfo.has(id)) return this.collegeInfo.get(id)!;
-		let res = await fetch("/colleges/" + id + ".json");
-		let collegeInfo = (await res.json()) as CollegeInfo;
-		this.collegeInfo.set(id, collegeInfo);
-		return collegeInfo;
-	}
-}
-
-export let collegeInfoManager: CollegeInfoManager = new CollegeInfoManager();

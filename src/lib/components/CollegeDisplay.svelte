@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ApplicationStatus, College, SupplementalType, dueDateToDate } from "$lib/colleges.svelte";
+	import { ApplicationStatus, College, SupplementalType } from "$lib/colleges.svelte";
 	import { type UserData } from "$lib/userdata.svelte";
 	import CollegeStats from "./CollegeStats.svelte";
 
@@ -18,26 +18,37 @@
 
 	let accentColor = $derived.by(() => {
 		switch (college.status) {
-			case ApplicationStatus.Pending: return "base-300";
-			case ApplicationStatus.Accepted: return "success";
-			case ApplicationStatus.Rejected: return "error";
-			case ApplicationStatus.Deferred: return "warning";
-			case ApplicationStatus.Committed: return "info";
+			case ApplicationStatus.Pending:
+				return "base-300";
+			case ApplicationStatus.Accepted:
+				return "success";
+			case ApplicationStatus.Rejected:
+				return "error";
+			case ApplicationStatus.Deferred:
+				return "warning";
+			case ApplicationStatus.Committed:
+				return "info";
 		}
 	});
 
-	let essaySupplementals = $derived(college.supplementals.filter((x) => x.type == SupplementalType.Essay));
-	let portfolioSupplementals = $derived(college.supplementals.filter((x) => x.type == SupplementalType.Portfolio));
-	let resumeSupplementals = $derived(college.supplementals.filter((x) => x.type == SupplementalType.Resume));
+	let essaySupplementals = $derived(
+		college.supplementals.filter((x) => x.type == SupplementalType.Essay)
+	);
+	let portfolioSupplementals = $derived(
+		college.supplementals.filter((x) => x.type == SupplementalType.Portfolio)
+	);
+	let resumeSupplementals = $derived(
+		college.supplementals.filter((x) => x.type == SupplementalType.Resume)
+	);
 
-	let dueDate = $derived(dueDateToDate(college.dueDate).toLocaleDateString());
+	let dueDate = $derived(college.dueDate.toLocaleDateString());
 </script>
 
 <!-- TAILWIND bg-base-300 bg-info bg-success bg-warning bg-error -->
-<div class="flex flex-row w-full rounded-sm bg-{accentColor} {isFocused ? 'z-10': ''}">
+<div class="flex w-full flex-row rounded-sm bg-{accentColor} {isFocused ? 'z-10' : ''}">
 	<div class="h-full w-1"></div>
 	<details
-		class="collapse-arrow collapse overflow-visible border border-base-300 bg-base-100 grow-1 rounded-none"
+		class="collapse-arrow collapse grow-1 overflow-visible rounded-none border border-base-300 bg-base-100"
 		onfocusin={() => (isFocused = true)}
 		onfocusout={() => (isFocused = false)}
 		open
@@ -45,20 +56,17 @@
 		<summary class="collapse-title flex flex-row">
 			<div class="flex w-full flex-row items-center gap-2">
 				<p class="h-full justify-center font-semibold">
-					{collegeInfo != null ? collegeInfo.Name : "unknown college"}
+					{collegeInfo != null ? collegeInfo.name : "unknown college"}
 				</p>
 				<div class="grow-1"></div>
 				{#if collegeInfo != null}
-					<details
-						class="dropdown dropdown-left"
-						bind:open={collegeInfoOpen}
-					>
+					<details class="dropdown dropdown-left" bind:open={collegeInfoOpen}>
 						<summary onblur={() => (collegeInfoOpen = false)}>
 							<div class="btn btn-square btn-sm">
 								<span class="iconify tabler--info-circle"></span>
 							</div>
 						</summary>
-						<div class="dropdown-content z-10 bg-base-100 w-150 shadow-sm p-2 pointer-events-none">
+						<div class="dropdown-content pointer-events-none z-10 w-150 bg-base-100 p-2 shadow-sm">
 							<CollegeStats {collegeInfo} {userData} inline={true}></CollegeStats>
 						</div>
 					</details>
@@ -75,7 +83,9 @@
 								<span class="iconify tabler--trash"></span>
 							</div>
 						</summary>
-						<button class="btn dropdown-content z-10 w-50 mr-2" onclick={deleteCollege}>Really delete?</button>
+						<button class="dropdown-content btn z-10 mr-2 w-50" onclick={deleteCollege}
+							>Really delete?</button
+						>
 					</details>
 				{/if}
 			</div>
@@ -104,7 +114,9 @@
 						<div class="flex flex-row gap-2">
 							<p>Essays -</p>
 							{#each essaySupplementals as supplemental}
-								<a class="link link-hover" target="_blank" href={supplemental.link}>{supplemental.name}</a>
+								<a class="link link-hover" target="_blank" href={supplemental.link}
+									>{supplemental.name}</a
+								>
 							{/each}
 						</div>
 					{/if}
@@ -112,7 +124,9 @@
 						<div class="flex flex-row gap-2">
 							<p>Resumes -</p>
 							{#each resumeSupplementals as supplemental}
-								<a class="link link-hover" target="_blank" href={supplemental.link}>{supplemental.name}</a>
+								<a class="link link-hover" target="_blank" href={supplemental.link}
+									>{supplemental.name}</a
+								>
 							{/each}
 						</div>
 					{/if}
@@ -120,7 +134,9 @@
 						<div class="flex flex-row gap-2">
 							<p>Portfolios -</p>
 							{#each portfolioSupplementals as supplemental}
-								<a class="link link-hover" target="_blank" href={supplemental.link}>{supplemental.name}</a>
+								<a class="link link-hover" target="_blank" href={supplemental.link}
+									>{supplemental.name}</a
+								>
 							{/each}
 						</div>
 					{/if}
@@ -128,7 +144,7 @@
 				{#each college.dates as date}
 					<div class="flex flex-col items-center justify-center">
 						<p>{date.name} -</p>
-						<p>{dueDateToDate(date.date).toLocaleDateString()}</p>
+						<p>{date.date.toLocaleDateString()}</p>
 					</div>
 				{/each}
 			</div>

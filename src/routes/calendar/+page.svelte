@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { type PageProps } from "./$types";
-	import CollegeEditor from "$lib/components/CollegeEditor.svelte";
 	import { UserData } from "$lib/userdata.svelte";
-	import { dueDateCutoff, dueDateToDate, type DueDate } from "$lib/colleges.svelte";
+	import { dueDateCutoff } from "$lib/collegeinfo.svelte";
 
 	let { params, data }: PageProps = $props();
 	let userData: UserData = data.userData;
@@ -10,9 +9,9 @@
 	class CollegeDate {
 		name: string;
 		collegeName: string;
-		date: DueDate;
+		date: Date;
 
-		constructor(name: string, collegeName: string, date: DueDate) {
+		constructor(name: string, collegeName: string, date: Date) {
 			this.name = name;
 			this.collegeName = collegeName;
 			this.date = date;
@@ -20,7 +19,7 @@
 	}
 
 	function addCollegeDateToMap(map: Map<number, CollegeDate[]>, date: CollegeDate) {
-		const month = date.date.Month - 1;
+		const month = date.date.getMonth();
 		if (!map.has(month)) {
 			map.set(month, []);
 		}
@@ -31,7 +30,7 @@
 	let dates = $derived.by(() => {
 		let ret = new Map<number, CollegeDate[]>();
 		for (const college of userData.colleges) {
-			const collegeName = college.collegeInfo?.Name ?? "Unknown College";
+			const collegeName = college.collegeInfo.name ?? "Unknown College";
 			addCollegeDateToMap(ret, new CollegeDate("Application Due", collegeName, college.dueDate));
 			for (const date of college.dates) {
 				addCollegeDateToMap(ret, new CollegeDate(date.name, collegeName, date.date));
@@ -63,7 +62,7 @@
 				{#each dates.get(getMonthFromIdx(idx))! as date}
 					<div class="flex-col items-center">
 						<p class="text-center">
-							{date.name} - {dueDateToDate(date.date).toLocaleDateString()}
+							{date.name} - {date.date.toLocaleDateString()}
 						</p>
 						<p class="text-center text-xs">{date.collegeName}</p>
 					</div>

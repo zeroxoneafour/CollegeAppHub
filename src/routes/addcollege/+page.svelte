@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { collegeInfoManager, College, type CollegeInfo } from "$lib/colleges.svelte";
+	import { collegeInfoManager, CollegeInfo } from "$lib/collegeinfo.svelte";
+	import { College } from "$lib/colleges.svelte";
 	import { goto } from "$app/navigation";
 	import CollegeEditor from "$lib/components/CollegeEditor.svelte";
 	import mainUserData from "$lib/userdata.svelte";
@@ -16,7 +17,7 @@
 
 	function setCollegeId(id: number) {
 		collegeSearch = collegeInfoManager.collegeRealNames.get(id)!;
-		college = new College(id);
+		college = new College(new CollegeInfo(id));
 	}
 
 	function addCollege() {

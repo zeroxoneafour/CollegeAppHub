@@ -1,5 +1,5 @@
 import type { LayoutLoad } from "./$types";
-import { collegeInfoManager } from "$lib/colleges.svelte";
+import { collegeInfoManager } from "$lib/collegeinfo.svelte";
 
 export const prerender = true;
 export const ssr = false;

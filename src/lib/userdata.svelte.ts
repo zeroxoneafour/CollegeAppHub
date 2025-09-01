@@ -1,42 +1,38 @@
 import { College } from "./colleges.svelte";
-import { browser } from "$app/environment";
 
 export class UserData {
 	colleges: College[] = $state([]);
 	readOnly: boolean = $state(false);
 	satScore: number = $state(1300);
 	actScore: number = $state(28);
+	publicUpload: boolean = $state(false);
 
 	toJSON(): object {
 		return {
-			colleges: this.colleges,
+			colleges: this.colleges.map((x) => x.toJSON()),
 			readOnly: this.readOnly,
 			satScore: this.satScore,
-			actScore: this.actScore
+			actScore: this.actScore,
+			publicUpload: this.publicUpload
 		};
+	}
+
+	loadJSON(json: any) {
+		this.colleges = json.colleges?.map((x: object) => College.fromJSON(x)) ?? this.colleges;
+		this.readOnly = json.readOnly ?? this.readOnly;
+		this.satScore = json.satScore ?? this.satScore;
+		this.actScore = json.actScore ?? this.actScore;
+		this.publicUpload = json.publicUpload ?? this.publicUpload;
+	}
+
+	static fromJSON(json: any): UserData {
+		const ret = new UserData();
+		ret.loadJSON(json);
+		return ret;
 	}
 
 	toString(): string {
 		return JSON.stringify(this.toJSON());
-	}
-
-	loadUserData(dataStr: string) {
-		let data = JSON.parse(dataStr);
-
-		this.colleges = data.colleges?.map((x: object) => College.fromJSON(x)) ?? this.colleges;
-		this.readOnly = data.readOnly ?? this.readOnly;
-		this.satScore = data.satScore ?? this.satScore;
-		this.actScore = data.actScore ?? this.actScore;
-	}
-
-	loadLocalStorage() {
-		if (!browser) return;
-		this.loadUserData(window.localStorage.getItem("userData") ?? "{}");
-	}
-
-	saveLocalStorage() {
-		if (!browser) return;
-		window.localStorage.setItem("userData", this.toString());
 	}
 }
 

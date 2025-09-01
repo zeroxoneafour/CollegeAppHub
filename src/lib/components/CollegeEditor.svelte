@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { College, dueDateToDate, NamedDate, Supplemental, SupplementalType } from "$lib/colleges.svelte";
+	import { College, NamedDate, Supplemental, SupplementalType } from "$lib/colleges.svelte";
 	import { UserData } from "$lib/userdata.svelte";
 	import DatePicker from "./ui/DatePicker.svelte";
-	let { college, userData }: { college: College, userData: UserData } = $props();
+	let { college, userData }: { college: College; userData: UserData } = $props();
 
 	let collegeInfo = $derived(college.collegeInfo);
 
@@ -10,27 +10,38 @@
 		college.supplementals.push(new Supplemental("", SupplementalType.Essay, ""));
 	}
 	function addDate() {
-		college.dates.push(new NamedDate("", { Month: 1, Day: 1 }));
+		college.dates.push(new NamedDate("", new Date()));
 	}
 </script>
 
 <div class="flex w-full flex-col items-center gap-10">
 	<div class="grid grid-cols-2 gap-2">
-		<p class="text-nowrap text-lg w-full h-full flex justify-end items-center">Application link -</p>
-		<div class="tooltip w-full h-full">
-			{#if collegeInfo != null && collegeInfo.WwwUrl != ""}
+		<p class="flex h-full w-full items-center justify-end text-lg text-nowrap">
+			Application link -
+		</p>
+		<div class="tooltip h-full w-full">
+			{#if collegeInfo.url != ""}
 				<div class="tooltip-content">
-					<p>Main college URL - {collegeInfo.WwwUrl}</p>
+					<p>Main college URL - {collegeInfo.url}</p>
 				</div>
 			{/if}
-			<input type="url" class="input" bind:value={college.applicationLink} placeholder="Application Link" />
+			<input
+				type="url"
+				class="input"
+				bind:value={college.applicationLink}
+				placeholder="Application Link"
+			/>
 		</div>
-		<p class="text-nowrap text-lg w-full h-full flex justify-end items-center">Application Due Date -</p>
-		<div class="tooltip w-full h-full">
-			{#if collegeInfo != null && collegeInfo.ApplicationRounds.length > 0}
+		<p class="flex h-full w-full items-center justify-end text-lg text-nowrap">
+			Application Due Date -
+		</p>
+		<div class="tooltip h-full w-full">
+			{#if collegeInfo.applicationRounds.length > 0}
 				<div class="tooltip-content">
-					{#each collegeInfo.ApplicationRounds as round}
-						<p>{round.Name} - {dueDateToDate(round.DueDate).toLocaleDateString()}{round.Binding ? " (Binding)" : ""}</p>
+					{#each collegeInfo.applicationRounds as round}
+						<p>
+							{round.name} - {round.dueDate.toLocaleDateString()}{round.binding ? " (Binding)" : ""}
+						</p>
 					{/each}
 				</div>
 			{/if}
@@ -82,13 +93,17 @@
 		<ul class="list">
 			{#each college.dates as date}
 				<li class="list-row">
-					<input class="input list-col-grow" type="text" bind:value={date.name} placeholder="Date name" />
+					<input
+						class="list-col-grow input"
+						type="text"
+						bind:value={date.name}
+						placeholder="Date name"
+					/>
 					<DatePicker bind:date={date.date}></DatePicker>
 					<button
 						aria-label="Delete date"
 						class="btn btn-square self-end"
-						onclick={() =>
-							college.dates.splice(college.dates.indexOf(date), 1)}
+						onclick={() => college.dates.splice(college.dates.indexOf(date), 1)}
 						><span class="iconify tabler--trash"></span></button
 					>
 				</li>

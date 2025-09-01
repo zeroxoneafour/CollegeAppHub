@@ -21,13 +21,23 @@
 		<input type="text" class="input" bind:value={email} />
 		<p class="flex h-full items-center">Password</p>
 		<input type="password" class="input" bind:value={password} />
+		<p class="flex h-full items-center">Public Upload</p>
+		<input class="toggle" type="checkbox" bind:checked={userData.publicUpload} />
 	</div>
 	<div class="flex flex-row gap-2">
 		<button class="btn" onclick={() => firebaseManager.logInOrSignUp(email, password)}
 			>Sign up/log in</button
 		>
-		<button class="btn" disabled={firebaseManager.user == null}>Upload Config</button>
-		<button class="btn" disabled={firebaseManager.user == null}>Download Config</button>
+		<button
+			class="btn"
+			disabled={firebaseManager.user == null}
+			onclick={() => firebaseManager.saveMainUserData()}>Upload Config</button
+		>
+		<button
+			class="btn"
+			disabled={firebaseManager.user == null}
+			onclick={() => firebaseManager.loadMainUserData()}>Download Config</button
+		>
 	</div>
 	<div class="flex flex-col items-center justify-center gap-2">
 		<p>Enter a config, or copy yours from below</p>
@@ -40,7 +50,9 @@
 		/>
 		<div class="flex flex-row gap-2">
 			<button class="btn" onclick={() => (configText = userData.toString())}>Export config</button>
-			<button class="btn" onclick={() => userData.loadUserData(configText)}>Import config</button>
+			<button class="btn" onclick={() => userData.loadJSON(JSON.stringify(configText))}
+				>Import config</button
+			>
 		</div>
 	</div>
 </div>

@@ -1,10 +1,5 @@
 <script lang="ts">
-	import {
-		type CollegeInfo,
-		type Value,
-		SupplementalRequired,
-		isSupplementalRequired
-	} from "$lib/colleges.svelte";
+	import { CollegeInfo, SupplementalRequired } from "$lib/collegeinfo.svelte";
 	import { UserData } from "$lib/userdata.svelte";
 
 	let {
@@ -15,22 +10,14 @@
 
 	function getSupplementalsByRequirement(requirement: SupplementalRequired): () => string[] {
 		return () => {
-			if (collegeInfo == null) return [];
-			let supplementalRequirements = collegeInfo.ApplicationDetails.SupplementalRequirements;
+			if (collegeInfo.requiredSupplementals == null) return [];
 
 			let ret = [];
 
-			const supplementals: [Value, string][] = [
-				[supplementalRequirements.EssayOrStatement, "Essay"],
-				[supplementalRequirements.Interview, "Interview"],
-				[supplementalRequirements.Portfolio, "Portfolio"],
-				[supplementalRequirements.AuditionOrPortfolioReview, "Portfolio Review"],
-				[supplementalRequirements.Resume, "Resume"]
-			];
-
-			for (const [supplemental, text] of supplementals) {
-				if (isSupplementalRequired(supplemental) === requirement) {
-					ret.push(text);
+			for (const [key, value] of Object.entries(collegeInfo.requiredSupplementals)) {
+				if (value === requirement) {
+					// https://stackoverflow.com/questions/4149276/how-to-convert-camelcase-to-camel-case
+					ret.push(key.replace(/([A-Z])/g, " $1").replace(/^./, (x) => x.toUpperCase()));
 				}
 			}
 
@@ -53,57 +40,57 @@
 	);
 
 	let actColor = $derived.by(() => {
-		if (collegeInfo == null) return "";
-		if (collegeInfo.CalculatedFields.ACTMin > userData.actScore) return "error";
-		else if (collegeInfo.CalculatedFields.ACTMax < userData.actScore) return "success";
+		if (collegeInfo.actScore == null) return "";
+		if (collegeInfo.actScore[0] > userData.actScore) return "error";
+		else if (collegeInfo.actScore[2] < userData.actScore) return "success";
 		else return "warning";
 	});
 	let satColor = $derived.by(() => {
-		if (collegeInfo == null) return "";
-		if (collegeInfo.CalculatedFields.SATMin > userData.satScore) return "error";
-		else if (collegeInfo.CalculatedFields.SATMax < userData.satScore) return "success";
+		if (collegeInfo.satScore == null) return "";
+		if (collegeInfo.satScore[0] > userData.satScore) return "error";
+		else if (collegeInfo.satScore[2] < userData.satScore) return "success";
 		else return "warning";
 	});
 	let acceptanceRateColor = $derived.by(() => {
-		if (collegeInfo == null) return "";
-		if (collegeInfo.CalculatedFields.AcceptanceRate > 75) return "success";
-		else if (collegeInfo.CalculatedFields.AcceptanceRate < 25) return "error";
+		if (collegeInfo.acceptanceRate == null) return "";
+		if (collegeInfo.acceptanceRate > 75) return "success";
+		else if (collegeInfo.acceptanceRate < 25) return "error";
 		else return "warning";
 	});
 </script>
 
 <div class="flex w-full flex-row items-center justify-center gap-5 {!inline ? 'md:flex-col' : ''}">
-	{#if collegeInfo.CalculatedFields.SATAvg != 0 || collegeInfo.CalculatedFields.ACTAvg != 0 || collegeInfo.CalculatedFields.AcceptanceRate > 0}
+	{#if collegeInfo.satScore || collegeInfo.actScore || collegeInfo.acceptanceRate}
 		<div class="flex flex-col md:flex-row md:gap-10">
 			<!-- TAILWIND GENERATE - progress-success progress-warning progress-error -->
-			{#if collegeInfo.CalculatedFields.SATAvg !== 0}
+			{#if collegeInfo.satScore}
 				<div>
-					<p class="w-full text-center">Average SAT - {collegeInfo.CalculatedFields.SATAvg}</p>
+					<p class="w-full text-center">Average SAT - {collegeInfo.satScore[1]}</p>
 					<progress
 						class="progress progress-{satColor} w-full"
-						value={collegeInfo.CalculatedFields.SATAvg - 800}
+						value={collegeInfo.satScore[1] - 800}
 						max="800"
 					></progress>
 				</div>
 			{/if}
-			{#if collegeInfo.CalculatedFields.ACTAvg !== 0}
+			{#if collegeInfo.actScore}
 				<div>
-					<p class="w-full text-center">Average ACT - {collegeInfo.CalculatedFields.ACTAvg}</p>
+					<p class="w-full text-center">Average ACT - {collegeInfo.actScore[1]}</p>
 					<progress
 						class="progress progress-{actColor} w-full"
-						value={collegeInfo.CalculatedFields.ACTAvg - 14}
+						value={collegeInfo.actScore[1] - 14}
 						max="22"
 					></progress>
 				</div>
 			{/if}
-			{#if collegeInfo.CalculatedFields.AcceptanceRate > 0}
+			{#if collegeInfo.acceptanceRate}
 				<div>
 					<p class="w-full text-center">
-						Acceptance Rate - {collegeInfo.CalculatedFields.AcceptanceRate.toFixed(2)}%
+						Acceptance Rate - {collegeInfo.acceptanceRate.toFixed(2)}%
 					</p>
 					<progress
 						class="progress progress-{acceptanceRateColor} w-full"
-						value={collegeInfo.CalculatedFields.AcceptanceRate}
+						value={collegeInfo.acceptanceRate}
 						max="100"
 					></progress>
 				</div>
@@ -111,7 +98,9 @@
 		</div>
 	{/if}
 	{#if totalSupplementals > 0}
-		<div class="flex flex-col items-center justify-center {inline ? "gap-2" : "gap-10"} md:flex-row">
+		<div
+			class="flex flex-col items-center justify-center {inline ? 'gap-2' : 'gap-10'} md:flex-row"
+		>
 			{#if requiredSupplementals.length > 0}
 				<p class="text-center text-xs">
 					Required- {requiredSupplementals.join(", ")}
