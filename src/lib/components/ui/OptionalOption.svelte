@@ -31,12 +31,12 @@
 		{#if value != null}
 			{#if type === "threenumber"}
 				<div class="flex flex-row">
-					<input class="input w-20" bind:value={value[0]} />
-					<input class="input w-20" bind:value={value[1]} />
-					<input class="input w-20" bind:value={value[2]} />
+					<input class="input w-20" bind:value={() => value[0], (v) => (value[0] = Number(v))} />
+					<input class="input w-20" bind:value={() => value[1], (v) => (value[1] = Number(v))} />
+					<input class="input w-20" bind:value={() => value[2], (v) => (value[2] = Number(v))} />
 				</div>
 			{:else if type === "number"}
-				<input class="input" bind:value />
+				<input class="input" bind:value={() => value, (v) => (value = Number(v))} />
 			{:else if type === "string"}
 				<input class="input" bind:value />
 			{:else}
