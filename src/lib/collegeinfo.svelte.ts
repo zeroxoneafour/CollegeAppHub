@@ -161,11 +161,11 @@ export enum SupplementalRequired {
 }
 
 export class SupplementalRequirements {
-	essay: SupplementalRequired;
-	resume: SupplementalRequired;
-	portfolio: SupplementalRequired;
-	interview: SupplementalRequired;
-	audition: SupplementalRequired;
+	essay: SupplementalRequired = SupplementalRequired.NotSpecified;
+	resume: SupplementalRequired = SupplementalRequired.NotSpecified;
+	portfolio: SupplementalRequired = SupplementalRequired.NotSpecified;
+	interview: SupplementalRequired = SupplementalRequired.NotSpecified;
+	audition: SupplementalRequired = SupplementalRequired.NotSpecified;
 
 	private static isSupplementalRequired(supplemental: Value): SupplementalRequired {
 		switch (supplemental.Value) {
@@ -184,7 +184,8 @@ export class SupplementalRequirements {
 		}
 	}
 
-	constructor(reqs: RawSupplementalRequirements) {
+	constructor(reqs?: RawSupplementalRequirements) {
+		if (!reqs) return;
 		this.essay = SupplementalRequirements.isSupplementalRequired(reqs.EssayOrStatement);
 		this.resume = SupplementalRequirements.isSupplementalRequired(reqs.Resume);
 		this.portfolio = SupplementalRequirements.isSupplementalRequired(reqs.Portfolio);
@@ -196,7 +197,7 @@ export class SupplementalRequirements {
 export class CollegeInfo {
 	collegeId: number | null = null;
 
-	name: string | null = $state(null);
+	name: string = $state("");
 	url: string | null = $state(null);
 
 	actScore: [number, number, number] | null = $state(null);
@@ -204,12 +205,16 @@ export class CollegeInfo {
 	acceptanceRate: number | null = $state(null);
 
 	applicationRounds: ApplicationRound[] = $state([]);
-	requiredSupplementals: SupplementalRequirements | null = $state(null);
+	requiredSupplementals: SupplementalRequirements = $state(new SupplementalRequirements());
 
 	constructor(collegeId?: number) {
 		if (collegeId == undefined) return;
-		this.collegeId = collegeId;
-		collegeInfoManager.getCollegeInfo(collegeId).then((info) => this.setFromRawCollegeInfo(info));
+		this.setCollegeId(collegeId);
+	}
+
+	setCollegeId(id: number) {
+		this.collegeId = id;
+		collegeInfoManager.getCollegeInfo(id).then((info) => this.setFromRawCollegeInfo(info));
 	}
 
 	private setFromRawCollegeInfo(info: RawCollegeInfo) {
@@ -241,10 +246,7 @@ export class CollegeInfo {
 	}
 
 	static fromJSON(json: any): CollegeInfo {
-		if (json.collegeId != null) {
-			return new CollegeInfo(json.collegeId);
-		}
-		const ret = new CollegeInfo();
+		const ret = new CollegeInfo(json.collegeId);
 
 		ret.name = json.name ?? null;
 		ret.url = json.url ?? null;

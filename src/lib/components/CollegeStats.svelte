@@ -60,6 +60,9 @@
 </script>
 
 <div class="flex w-full flex-row items-center justify-center gap-5 {!inline ? 'md:flex-col' : ''}">
+	<p class={inline ? "hidden" : ""}>
+		{collegeInfo.name != "" ? collegeInfo.name : "Unknown College"}
+	</p>
 	{#if collegeInfo.satScore || collegeInfo.actScore || collegeInfo.acceptanceRate}
 		<div class="flex flex-col md:flex-row md:gap-10">
 			<!-- TAILWIND GENERATE - progress-success progress-warning progress-error -->

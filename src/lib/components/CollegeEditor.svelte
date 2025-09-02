@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { College, NamedDate, Supplemental, SupplementalType } from "$lib/colleges.svelte";
+	import OptionalOption from "./ui/OptionalOption.svelte";
 	import DatePicker from "./ui/DatePicker.svelte";
 	let { college }: { college: College } = $props();
 
@@ -11,6 +12,16 @@
 	function addDate() {
 		college.dates.push(new NamedDate("", new Date()));
 	}
+
+	let collegeInfoOpen: boolean = $state(false);
+	function toggleCollegeInfo() {
+		if (!collegeInfoOpen) {
+			collegeInfo.collegeId = null;
+			collegeInfoOpen = true;
+		} else {
+			collegeInfoOpen = false;
+		}
+	}
 </script>
 
 <div class="flex w-full flex-col items-center gap-10">
@@ -19,7 +30,7 @@
 			Application link -
 		</p>
 		<div class="tooltip h-full w-full">
-			{#if collegeInfo.url != ""}
+			{#if collegeInfo.url != null}
 				<div class="tooltip-content">
 					<p>Main college URL - {collegeInfo.url}</p>
 				</div>
@@ -108,5 +119,19 @@
 				</li>
 			{/each}
 		</ul>
+	{/if}
+	<button class="btn" onclick={toggleCollegeInfo}
+		>{collegeInfoOpen ? "Close" : "Edit"} College Info</button
+	>
+	{#if collegeInfoOpen}
+		<div class="flex flex-col items-center gap-2">
+			<input class="input" bind:value={collegeInfo.name} placeholder="College Name" />
+			<OptionalOption name="ACT Score" type="threenumber" bind:value={collegeInfo.actScore}
+			></OptionalOption>
+			<OptionalOption name="SAT Score" type="threenumber" bind:value={collegeInfo.satScore}
+			></OptionalOption>
+			<OptionalOption name="Acceptance Rate" type="number" bind:value={collegeInfo.acceptanceRate}
+			></OptionalOption>
+		</div>
 	{/if}
 </div>

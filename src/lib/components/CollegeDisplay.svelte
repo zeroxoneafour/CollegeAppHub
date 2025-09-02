@@ -50,7 +50,6 @@
 
 <!-- TAILWIND bg-base-300 bg-info bg-success bg-warning bg-error -->
 <div class="flex w-full flex-row rounded-sm bg-{accentColor} {isFocused ? 'z-10' : ''}">
-	<div class="h-full w-1"></div>
 	<details
 		class="collapse-arrow collapse grow-1 overflow-visible rounded-none border border-base-300 bg-base-100"
 		onfocusin={() => (isFocused = true)}
@@ -60,7 +59,7 @@
 		<summary class="collapse-title flex flex-row">
 			<div class="flex w-full flex-row items-center gap-2">
 				<p class="h-full justify-center font-semibold">
-					{collegeInfo != null ? collegeInfo.name : "unknown college"}
+					{collegeInfo.name != "" ? collegeInfo.name : "Unknown College"}
 				</p>
 				<div class="grow-1"></div>
 				{#if collegeInfo != null}
