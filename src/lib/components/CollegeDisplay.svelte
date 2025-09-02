@@ -50,6 +50,8 @@
 
 <!-- TAILWIND bg-base-300 bg-info bg-success bg-warning bg-error -->
 <div class="flex w-full flex-row rounded-sm bg-{accentColor} {isFocused ? 'z-10' : ''}">
+	<!-- DO NOT REMOVE - shows status -->
+	<div class="h-full w-1"></div>
 	<details
 		class="collapse-arrow collapse grow-1 overflow-visible rounded-none border border-base-300 bg-base-100"
 		onfocusin={() => (isFocused = true)}

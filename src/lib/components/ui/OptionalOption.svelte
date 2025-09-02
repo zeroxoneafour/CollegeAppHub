@@ -6,7 +6,7 @@
 <div class="flex flex-row items-center gap-2">
 	<p>{name}</p>
 	<input
-		class="toggle"
+		class="checkbox"
 		type="checkbox"
 		bind:checked={
 			() => value !== null,

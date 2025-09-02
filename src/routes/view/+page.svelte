@@ -2,6 +2,7 @@
 	import CollegeList from "$lib/components/CollegeList.svelte";
 	import type { UserData } from "$lib/userdata.svelte";
 	import { userDataManager } from "$lib/userdata.svelte";
+	import type { PageProps } from "./$types";
 
 	let { params, data }: PageProps = $props();
 	let uid: string = data.uid;

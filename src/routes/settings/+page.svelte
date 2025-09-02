@@ -3,11 +3,8 @@
 	import userData from "$lib/userdata.svelte";
 
 	let configText: string = $state("");
+
 	let configElement: HTMLInputElement | undefined = $state();
-
-	let email = $state("");
-	let password = $state("");
-
 	let shareUrlElement: HTMLInputElement | undefined = $state();
 </script>
 
@@ -17,12 +14,8 @@
 		<input type="number" class="input" min="1" max="36" bind:value={userData.actScore} />
 		<p class="flex h-full items-center">SAT Score</p>
 		<input type="number" class="input" min="1" max="1600" bind:value={userData.satScore} />
-		<p class="flex h-full items-center">Email</p>
-		<input type="text" class="input" bind:value={email} />
-		<p class="flex h-full items-center">Password</p>
-		<input type="password" class="input" bind:value={password} />
 		<p class="flex h-full items-center">Public Upload</p>
-		<input class="toggle" type="checkbox" bind:checked={userData.publicUpload} />
+		<input class="checkbox m-auto" type="checkbox" bind:checked={userData.publicUpload} />
 		{#if firebaseManager.user != null && userData.publicUpload}
 			<p class="flex h-full items-center">Share link</p>
 			<input
@@ -31,22 +24,9 @@
 				bind:this={shareUrlElement}
 				onclick={() => shareUrlElement!.select()}
 			/>
+		{:else if userData.publicUpload}
+			<p class="col-span-2 flex h-full items-center">Log in to get a shareable link!</p>
 		{/if}
-	</div>
-	<div class="flex flex-row gap-2">
-		<button class="btn" onclick={() => firebaseManager.logInOrSignUp(email, password)}
-			>Sign up/log in</button
-		>
-		<button
-			class="btn"
-			disabled={firebaseManager.user == null}
-			onclick={() => firebaseManager.saveMainUserData()}>Upload Config</button
-		>
-		<button
-			class="btn"
-			disabled={firebaseManager.user == null}
-			onclick={() => firebaseManager.loadMainUserData()}>Download Config</button
-		>
 	</div>
 	<div class="flex flex-col items-center justify-center gap-2">
 		<p>Enter a config, or copy yours from below</p>

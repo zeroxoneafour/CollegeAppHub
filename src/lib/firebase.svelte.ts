@@ -21,6 +21,7 @@ import {
 
 import { initializeAnalytics, type Analytics } from "firebase/analytics";
 import mainUserData, { UserData } from "./userdata.svelte";
+import logger from "./log.svelte";
 
 class FirebaseManager {
 	app: FirebaseApp;
@@ -48,25 +49,33 @@ class FirebaseManager {
 		this.database = getDatabase(this.app);
 	}
 
-	async logInOrSignUp(email: string, password: string) {
-		let cred: UserCredential | undefined = undefined;
+	async logIn(email: string, password: string): Promise<boolean> {
 		try {
-			cred = await createUserWithEmailAndPassword(this.auth, email, password);
+			this.user = (await signInWithEmailAndPassword(this.auth, email, password)).user;
+			return true;
 		} catch (err: any) {
-			if (err.code == "auth/email-already-in-use") {
-				cred = await signInWithEmailAndPassword(this.auth, email, password);
-			}
+			logger.logError(err.code);
+			return false;
 		}
-		if (cred != undefined) this.user = cred.user;
 	}
 
-	async loadMainUserData() {
+	async signUp(email: string, password: string): Promise<boolean> {
+		try {
+			this.user = (await createUserWithEmailAndPassword(this.auth, email, password)).user;
+			return true;
+		} catch (err: any) {
+			logger.logError(err.code);
+			return false;
+		}
+	}
+
+	async downloadMainUserData() {
 		if (this.user == null) return null;
 
 		// check both public and private data for config download
 		for (const path of ["private_data/", "public_data/"]) {
 			const dbPath = path + this.user.uid;
-			const snapshot = await dbGet(child(ref(this.database), dbPath));
+			const snapshot = await dbGet(ref(this.database, dbPath));
 			if (snapshot.exists()) {
 				mainUserData.loadJSON(snapshot.val());
 				return;
@@ -74,7 +83,7 @@ class FirebaseManager {
 		}
 	}
 
-	async saveMainUserData() {
+	async uploadMainUserData() {
 		if (this.user == null) return;
 		const publicUpload = mainUserData.publicUpload;
 
@@ -83,7 +92,7 @@ class FirebaseManager {
 
 		// remove old data in case switching from public to private or vice versa
 		const otherDbPath = (publicUpload ? "private_data/" : "public_data/") + this.user.uid;
-		remove(ref(this.database, otherDbPath));
+		await remove(ref(this.database, otherDbPath));
 	}
 
 	async fetchUserData(uid: string): Promise<UserData | null> {
