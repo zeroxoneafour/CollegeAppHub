@@ -51,10 +51,10 @@ class FirebaseManager {
 	async logInOrSignUp(email: string, password: string) {
 		let cred: UserCredential | undefined = undefined;
 		try {
-			cred = await signInWithEmailAndPassword(this.auth, email, password);
+			cred = await createUserWithEmailAndPassword(this.auth, email, password);
 		} catch (err: any) {
-			if (err.code == "auth/user-not-found") {
-				cred = await createUserWithEmailAndPassword(this.auth, email, password);
+			if (err.code == "auth/email-already-in-use") {
+				cred = await signInWithEmailAndPassword(this.auth, email, password);
 			}
 		}
 		if (cred != undefined) this.user = cred.user;
