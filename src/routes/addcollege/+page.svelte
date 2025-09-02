@@ -56,7 +56,9 @@
 				<ul class="dropdown-content menu w-full bg-base-100 shadow-sm">
 					{#each collegeSearchResults as college}
 						<li class="flex w-full items-center justify-center">
-							<button class="w-full justify-center" onclick={() => setCollegeId(college.id)}
+							<button
+								class="w-full justify-center text-center"
+								onclick={() => setCollegeId(college.id)}
 								>{collegeInfoManager.collegeRealNames.get(college.id)}</button
 							>
 						</li>
