@@ -26,13 +26,18 @@
 </svelte:head>
 
 <div class="flex h-screen w-screen flex-col bg-base-100">
-	<div class="sticky top-0 z-10 navbar justify-center gap-5 bg-base-100 px-10 shadow-sm">
+	<div
+		class="sticky top-0 z-10 navbar justify-center gap-2 bg-base-100 px-10 pr-4 pl-4 shadow-sm sm:gap-5"
+	>
 		<a href="/" class="flex flex-row items-center gap-5">
 			<img alt="Logo" src={logo} class="h-10" />
-			<p class="text-xl font-semibold">College App Hub</p></a
+			<p class="hidden text-xl font-semibold sm:inline">College App Hub</p></a
 		>
-		<div class="flex-1"></div>
-		<a class="btn" href="/addcollege">Add College</a>
+		<div class="sm:flex-1"></div>
+		<a class="btn max-sm:btn-square" href="/addcollege">
+			<p class="hidden sm:inline">Add College</p>
+			<span class="iconify text-2xl tabler--plus sm:hidden"></span>
+		</a>
 		<a href="/calendar" aria-label="Calendar" class="btn btn-square">
 			<span class="iconify text-2xl tabler--calendar"></span>
 		</a>
@@ -46,7 +51,9 @@
 				>
 				<ul class="dropdown-content menu z-1 w-52 rounded-box bg-base-100 p-2 shadow-sm">
 					<li><button onclick={() => firebaseManager.uploadMainUserData()}>Upload</button></li>
-					<li><button onclick={() => firebaseManager.downloadMainUserData()}>Download</button></li>
+					<li>
+						<button onclick={() => firebaseManager.downloadMainUserData()}>Download</button>
+					</li>
 				</ul>
 			</details>
 		{:else}

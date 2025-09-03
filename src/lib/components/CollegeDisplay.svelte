@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ApplicationStatus, College, SupplementalType } from "$lib/colleges.svelte";
-	import { type UserData } from "$lib/userdata.svelte";
+	import { SortOrder, type UserData } from "$lib/userdata.svelte";
 	import CollegeStats from "./CollegeStats.svelte";
 
 	let {
@@ -14,6 +14,10 @@
 	let collegeInfoOpen = $state(false);
 	let collegeDeleteMenuOpen = $state(false);
 	function deleteCollege() {
+		if (!collegeDeleteMenuOpen) {
+			collegeDeleteMenuOpen = true;
+			return;
+		}
 		collegeDeleteMenuOpen = false;
 		userData.colleges.splice(collegeIndex, 1);
 	}
@@ -46,12 +50,27 @@
 	);
 
 	let dueDate = $derived(college.dueDate.toLocaleDateString());
+
+	function moveCollegeUp() {
+		if (collegeIndex <= 0) return;
+		let colleges = userData.colleges.slice();
+		colleges.splice(collegeIndex, 1);
+		colleges.splice(collegeIndex - 1, 0, college);
+		userData.colleges = colleges;
+	}
+	function moveCollegeDown() {
+		if (collegeIndex >= userData.colleges.length - 1) return;
+		let colleges = userData.colleges.slice();
+		colleges.splice(collegeIndex, 1);
+		colleges.splice(collegeIndex + 1, 0, college);
+		userData.colleges = colleges;
+	}
 </script>
 
 <!-- TAILWIND bg-base-300 bg-info bg-success bg-warning bg-error -->
 <div class="flex w-full flex-row rounded-sm bg-{accentColor} {isFocused ? 'z-10' : ''}">
 	<!-- DO NOT REMOVE - shows status -->
-	<div class="h-full w-1"></div>
+	<div class="pointer-events-none h-full w-1"></div>
 	<details
 		class="collapse-arrow collapse grow-1 overflow-visible rounded-none border border-base-300 bg-base-100"
 		onfocusin={() => (isFocused = true)}
@@ -59,7 +78,7 @@
 		open
 	>
 		<summary class="collapse-title flex flex-row">
-			<div class="flex w-full flex-row items-center gap-2">
+			<div class="flex w-full flex-row gap-2">
 				<p class="h-full justify-center font-semibold">
 					{collegeInfo.name != "" ? collegeInfo.name : "Unknown College"}
 				</p>
@@ -76,7 +95,67 @@
 						</div>
 					</details>
 				{/if}
-				{#if !readonly}
+			</div>
+		</summary>
+		<div class="collapse-content flex w-full flex-col items-center gap-4 md:flex-row">
+			{#if college.applicationLink != ""}
+				<a class="btn" href={college.applicationLink} target="_blank">Application Link</a>
+			{/if}
+			<div class="flex flex-col items-center">
+				<p>Due Date</p>
+				<p>{dueDate}</p>
+			</div>
+			<div class="flex flex-col items-center">
+				<p>Application Status</p>
+				<select class="select" bind:value={college.status} disabled={readonly}>
+					<option value={ApplicationStatus.Accepted}>Accepted</option>
+					<option value={ApplicationStatus.Committed}>Committed</option>
+					<option value={ApplicationStatus.Deferred}>Deferred</option>
+					<option value={ApplicationStatus.Rejected}>Rejected</option>
+					<option value={ApplicationStatus.Pending}>Pending</option>
+				</select>
+			</div>
+			<div class="flex flex-col gap-2">
+				{#if essaySupplementals.length > 0}
+					<div class="flex flex-col items-center md:flex-row md:gap-2">
+						<p>Essays -</p>
+						{#each essaySupplementals as supplemental}
+							<a class="link text-center link-hover" target="_blank" href={supplemental.link}
+								>{supplemental.name}</a
+							>
+						{/each}
+					</div>
+				{/if}
+				{#if resumeSupplementals.length > 0}
+					<div class="flex flex-col items-center md:flex-row md:gap-2">
+						<p>Resumes -</p>
+						{#each resumeSupplementals as supplemental}
+							<a class="link text-center link-hover" target="_blank" href={supplemental.link}
+								>{supplemental.name}</a
+							>
+						{/each}
+					</div>
+				{/if}
+				{#if portfolioSupplementals.length > 0}
+					<div class="flex flex-col items-center md:flex-row md:gap-2">
+						<p>Portfolios -</p>
+						{#each portfolioSupplementals as supplemental}
+							<a class="link text-center link-hover" target="_blank" href={supplemental.link}
+								>{supplemental.name}</a
+							>
+						{/each}
+					</div>
+				{/if}
+			</div>
+			{#each college.dates as date}
+				<div class="flex flex-col items-center justify-center">
+					<p>{date.name} -</p>
+					<p>{date.date.toLocaleDateString()}</p>
+				</div>
+			{/each}
+			{#if !readonly}
+				<div class="flex-1"></div>
+				<div class="flex flex-row gap-1 md:max-lg:flex-col">
 					<a
 						class="btn btn-square btn-sm"
 						href="/editcollege?index={collegeIndex}"
@@ -84,75 +163,33 @@
 					>
 					<details class="dropdown dropdown-left" bind:open={collegeDeleteMenuOpen}>
 						<summary>
-							<div class="btn btn-square btn-sm">
+							<button
+								class="btn btn-square btn-sm"
+								onclick={deleteCollege}
+								aria-label="Delete college"
+								onblur={() => (collegeDeleteMenuOpen = false)}
+							>
 								<span class="iconify tabler--trash"></span>
-							</div>
+							</button>
 						</summary>
-						<button class="dropdown-content btn z-10 mr-2 w-50" onclick={deleteCollege}
-							>Really delete?</button
-						>
+						<p class="dropdown-content z-10 mr-2 w-50 bg-base-100 text-center shadow-sm">
+							Really delete? Press trash again to confirm
+						</p>
 					</details>
-				{/if}
-			</div>
-		</summary>
-		<div class="collapse-content flex flex-row">
-			<div class="flex flex-row items-center gap-8">
-				{#if college.applicationLink != ""}
-					<a class="btn" href={college.applicationLink} target="_blank">Application Link</a>
-				{/if}
-				<div class="flex flex-col items-center">
-					<p>Due Date</p>
-					<p>{dueDate}</p>
-				</div>
-				<div class="flex flex-col items-center">
-					<p>Application Status</p>
-					<select class="select" bind:value={college.status} disabled={readonly}>
-						<option value={ApplicationStatus.Accepted}>Accepted</option>
-						<option value={ApplicationStatus.Committed}>Committed</option>
-						<option value={ApplicationStatus.Deferred}>Deferred</option>
-						<option value={ApplicationStatus.Rejected}>Rejected</option>
-						<option value={ApplicationStatus.Pending}>Pending</option>
-					</select>
-				</div>
-				<div class="flex flex-col">
-					{#if essaySupplementals.length > 0}
-						<div class="flex flex-row gap-2">
-							<p>Essays -</p>
-							{#each essaySupplementals as supplemental}
-								<a class="link link-hover" target="_blank" href={supplemental.link}
-									>{supplemental.name}</a
-								>
-							{/each}
-						</div>
-					{/if}
-					{#if resumeSupplementals.length > 0}
-						<div class="flex flex-row gap-2">
-							<p>Resumes -</p>
-							{#each resumeSupplementals as supplemental}
-								<a class="link link-hover" target="_blank" href={supplemental.link}
-									>{supplemental.name}</a
-								>
-							{/each}
-						</div>
-					{/if}
-					{#if portfolioSupplementals.length > 0}
-						<div class="flex flex-row gap-2">
-							<p>Portfolios -</p>
-							{#each portfolioSupplementals as supplemental}
-								<a class="link link-hover" target="_blank" href={supplemental.link}
-									>{supplemental.name}</a
-								>
-							{/each}
-						</div>
+					{#if userData.collegeSortOrder === SortOrder.Custom}
+						<button
+							class="btn btn-square btn-sm"
+							aria-label="Move college up"
+							onclick={moveCollegeUp}><span class="iconify tabler--arrow-up"></span></button
+						>
+						<button
+							class="btn btn-square btn-sm"
+							aria-label="Move college down"
+							onclick={moveCollegeDown}><span class="iconify tabler--arrow-down"></span></button
+						>
 					{/if}
 				</div>
-				{#each college.dates as date}
-					<div class="flex flex-col items-center justify-center">
-						<p>{date.name} -</p>
-						<p>{date.date.toLocaleDateString()}</p>
-					</div>
-				{/each}
-			</div>
+			{/if}
 		</div>
 	</details>
 </div>

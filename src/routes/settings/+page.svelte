@@ -17,10 +17,9 @@
 		<p class="flex h-full items-center">Public Upload</p>
 		<input class="checkbox m-auto" type="checkbox" bind:checked={userData.publicUpload} />
 		{#if firebaseManager.user != null && userData.publicUpload}
-			<p class="flex h-full items-center">Share link</p>
 			<input
 				value={window.location.origin + "/view/?uid=" + firebaseManager.user.uid}
-				class="input"
+				class="input col-span-2"
 				bind:this={shareUrlElement}
 				onclick={() => shareUrlElement!.select()}
 			/>

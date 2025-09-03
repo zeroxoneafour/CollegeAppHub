@@ -52,7 +52,7 @@
 	}
 </script>
 
-<div class="grid h-full w-full grid-cols-6 gap-5 p-10">
+<div class="grid h-full w-full grid-cols-2 gap-5 p-10 sm:grid-cols-3 md:grid-cols-6">
 	{#each { length: 12 }, idx}
 		<div
 			class="flex h-full w-full flex-col items-center gap-2 overflow-hidden rounded-sm bg-base-100 p-2 shadow-sm"

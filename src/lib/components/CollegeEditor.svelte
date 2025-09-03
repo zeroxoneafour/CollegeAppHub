@@ -58,14 +58,14 @@
 			<DatePicker bind:date={college.dueDate}></DatePicker>
 		</div>
 	</div>
-	<div class="flex flex-col gap-10 md:flex-row">
+	<div class="flex flex-col gap-10 sm:flex-row">
 		<h1 class="text-4xl">Supplementals</h1>
 		<button class="btn" onclick={addSupplemental}>Add Supplemental</button>
 	</div>
 	{#if college.supplementals.length > 0}
 		<ul class="list">
 			{#each college.supplementals as supplemental}
-				<li class="list-row">
+				<li class="list-row flex flex-col items-center sm:flex-row">
 					<input
 						class="input"
 						type="text"
@@ -86,7 +86,7 @@
 					/>
 					<button
 						aria-label="Delete supplemental"
-						class="btn btn-square self-end"
+						class="btn self-end max-sm:w-full sm:btn-square"
 						onclick={() =>
 							college.supplementals.splice(college.supplementals.indexOf(supplemental), 1)}
 						><span class="iconify tabler--trash"></span></button
@@ -95,14 +95,14 @@
 			{/each}
 		</ul>
 	{/if}
-	<div class="flex flex-col gap-10 md:flex-row">
+	<div class="flex flex-col gap-10 sm:flex-row">
 		<h1 class="text-4xl">Dates</h1>
 		<button class="btn" onclick={addDate}>Add Date</button>
 	</div>
 	{#if college.dates.length > 0}
 		<ul class="list">
 			{#each college.dates as date}
-				<li class="list-row">
+				<li class="list-row flex flex-col sm:flex-row">
 					<input
 						class="list-col-grow input"
 						type="text"
@@ -112,7 +112,7 @@
 					<DatePicker bind:date={date.date}></DatePicker>
 					<button
 						aria-label="Delete date"
-						class="btn btn-square self-end"
+						class="btn self-end max-sm:w-full sm:btn-square"
 						onclick={() => college.dates.splice(college.dates.indexOf(date), 1)}
 						><span class="iconify tabler--trash"></span></button
 					>

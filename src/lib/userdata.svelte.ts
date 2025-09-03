@@ -1,18 +1,25 @@
 import { College } from "./colleges.svelte";
 import firebaseManager from "./firebase.svelte";
 
+export enum SortOrder {
+	Custom,
+	DueDate,
+	Alphabetical
+}
 export class UserData {
 	colleges: College[] = $state([]);
 	satScore: number = $state(1300);
 	actScore: number = $state(28);
 	publicUpload: boolean = $state(false);
+	collegeSortOrder: SortOrder = $state(SortOrder.Custom);
 
 	toJSON(): object {
 		return {
 			colleges: this.colleges.map((x) => x.toJSON()),
 			satScore: this.satScore,
 			actScore: this.actScore,
-			publicUpload: this.publicUpload
+			publicUpload: this.publicUpload,
+			collegeSortOrder: this.collegeSortOrder
 		};
 	}
 
@@ -21,6 +28,7 @@ export class UserData {
 		this.satScore = json.satScore ?? this.satScore;
 		this.actScore = json.actScore ?? this.actScore;
 		this.publicUpload = json.publicUpload ?? this.publicUpload;
+		this.collegeSortOrder = json.collegeSortOrder ?? this.collegeSortOrder;
 	}
 
 	static fromJSON(json: any): UserData {
