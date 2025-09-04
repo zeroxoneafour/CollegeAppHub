@@ -79,9 +79,17 @@
 	>
 		<summary class="collapse-title flex flex-row">
 			<div class="flex w-full flex-row gap-2">
-				<p class="h-full justify-center font-semibold">
-					{collegeInfo.name != "" ? collegeInfo.name : "Unknown College"}
-				</p>
+				{#if college.applicationLink != ""}
+					<a
+						class="h-full link justify-center font-semibold link-hover"
+						href={college.applicationLink}
+						target="_blank">{collegeInfo.name != "" ? collegeInfo.name : "Unknown College"}</a
+					>
+				{:else}
+					<p class="h-full justify-center font-semibold">
+						{collegeInfo.name != "" ? collegeInfo.name : "Unknown College"}
+					</p>
+				{/if}
 				<div class="grow-1"></div>
 				{#if collegeInfo != null}
 					<details class="dropdown dropdown-left" bind:open={collegeInfoOpen}>
@@ -97,10 +105,7 @@
 				{/if}
 			</div>
 		</summary>
-		<div class="collapse-content flex w-full flex-col items-center gap-4 md:flex-row">
-			{#if college.applicationLink != ""}
-				<a class="btn" href={college.applicationLink} target="_blank">Application Link</a>
-			{/if}
+		<div class="collapse-content flex w-full flex-col items-center gap-4 md:flex-row lg:gap-10">
 			<div class="flex flex-col items-center">
 				<p>Due Date</p>
 				<p>{dueDate}</p>

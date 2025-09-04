@@ -69,11 +69,15 @@ class FirebaseManager {
 		}
 	}
 
-	async downloadMainUserData() {
+	async downloadMainUserData(path?: string) {
 		if (this.user == null) return null;
 
 		// check both public and private data for config download
-		for (const path of ["private_data/", "public_data/"]) {
+		let paths = ["private_data/", "public_data/"];
+		if (path != undefined) {
+			paths = [path];
+		}
+		for (const path of paths) {
 			const dbPath = path + this.user.uid;
 			const snapshot = await dbGet(ref(this.database, dbPath));
 			if (snapshot.exists()) {
@@ -93,6 +97,33 @@ class FirebaseManager {
 		// remove old data in case switching from public to private or vice versa
 		const otherDbPath = (publicUpload ? "private_data/" : "public_data/") + this.user.uid;
 		await remove(ref(this.database, otherDbPath));
+	}
+
+	async getLastModifiedTime(uid: string): Promise<[number, string] | null> {
+		for (const path of ["private_data/", "public_data/"]) {
+			const dbPath = path + uid + "/lastModifiedTime";
+			const snapshot = await dbGet(ref(this.database, dbPath));
+			if (snapshot.exists()) {
+				return [snapshot.val() as number, path];
+			}
+		}
+		return null;
+	}
+
+	async syncMainUserData() {
+		if (this.user == null) return;
+		const tmp = await this.getLastModifiedTime(this.user.uid);
+		if (tmp == null) {
+			await this.uploadMainUserData();
+			return;
+		}
+		const [lastModifiedTime, path] = tmp;
+		// cloud copy is more up to date
+		if (lastModifiedTime > mainUserData.lastModifiedTime) {
+			await this.downloadMainUserData(path);
+		} else {
+			await this.uploadMainUserData();
+		}
 	}
 
 	async fetchUserData(uid: string): Promise<UserData | null> {

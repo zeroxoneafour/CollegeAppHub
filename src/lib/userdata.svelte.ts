@@ -12,6 +12,8 @@ export class UserData {
 	actScore: number = $state(28);
 	publicUpload: boolean = $state(false);
 	collegeSortOrder: SortOrder = $state(SortOrder.Custom);
+	// no state because this is updated whenever the rest of the state changes
+	lastModifiedTime: number = 0;
 
 	toJSON(): object {
 		return {
@@ -19,16 +21,18 @@ export class UserData {
 			satScore: this.satScore,
 			actScore: this.actScore,
 			publicUpload: this.publicUpload,
-			collegeSortOrder: this.collegeSortOrder
+			collegeSortOrder: this.collegeSortOrder,
+			lastModifiedTime: this.lastModifiedTime
 		};
 	}
 
 	loadJSON(json: any) {
-		this.colleges = json.colleges?.map((x: object) => College.fromJSON(x)) ?? this.colleges;
-		this.satScore = json.satScore ?? this.satScore;
-		this.actScore = json.actScore ?? this.actScore;
-		this.publicUpload = json.publicUpload ?? this.publicUpload;
-		this.collegeSortOrder = json.collegeSortOrder ?? this.collegeSortOrder;
+		this.colleges = json.colleges?.map((x: object) => College.fromJSON(x)) ?? [];
+		this.satScore = json.satScore ?? 1300;
+		this.actScore = json.actScore ?? 28;
+		this.publicUpload = json.publicUpload ?? false;
+		this.collegeSortOrder = json.collegeSortOrder ?? SortOrder.Custom;
+		this.lastModifiedTime = json.lastModifiedTime ?? 0;
 	}
 
 	static fromJSON(json: any): UserData {

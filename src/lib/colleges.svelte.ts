@@ -66,13 +66,12 @@ export class College {
 
 	static fromJSON(json: any): College {
 		const college = new College(CollegeInfo.fromJSON(json.collegeInfo));
-		college.status = json.status ?? college.status;
+		college.status = json.status ?? ApplicationStatus.Pending;
 		college.supplementals =
-			json.supplementals?.map((x: any) => new Supplemental(x.name, x.type, x.link)) ??
-			college.supplementals;
-		college.applicationLink = json.applicationLink ?? college.applicationLink;
-		college.dueDate = new Date(json.dueDate) ?? college.dueDate;
-		college.dates = json.dates?.map((x: any) => new NamedDate(x.name, x.date)) ?? college.dates;
+			json.supplementals?.map((x: any) => new Supplemental(x.name, x.type, x.link)) ?? [];
+		college.applicationLink = json.applicationLink ?? "";
+		college.dueDate = new Date(json.dueDate) ?? new Date();
+		college.dates = json.dates?.map((x: any) => new NamedDate(x.name, x.date)) ?? [];
 		return college;
 	}
 
